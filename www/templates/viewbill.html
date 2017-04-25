@@ -1,0 +1,44 @@
+<div has-bouncing="false" style="height:100%" id="bill">
+  <div class="od_header">
+  <img class="pop_1_close2" src="img/popup/btn_close.png" ng-click="closeDetailPopupClick()">
+    <!-- <div class="od_timedelivery">{{editingOrder.timedelivery}}</div>
+    <div class="od_timereceive">(Thời gian nhận hàng)</div> -->
+    <div class="od_restname">Helio</div>
+    <div class="od_restaddress">Vietnam Specialty Coffee</div>
+    <div class="od_restphone">(+84) 466 623 866</div>
+    <div class="od_sperateline"></div>
+  </div>
+  <div class="od_list_product">
+    <div ng-repeat="item in currentOrderInBill.bill_product">
+      <div class="popExchange_gift2">
+        <span class="popExchange_coin" style="font-size: 13px">{{item.item_name}}</span>
+        <span class="popExchange_quantity">| {{item.quantity}} |</span>
+        <span class="popExchange_monney">{{ utils.formatMoney(item.amount * 1); }}</span>
+      </div>
+    </div>
+  </div>
+  <div class="od_footer">
+    <div class="od_sperateline"></div>
+    <div class="row od_row_subtotal">
+      <div class="col col-70">Sub-Total</div>
+      <div class="col col-30 od_p_money">{{utils.formatMoney(currentOrderInBill.cart.subTotal)}}</div>
+    </div>
+    <div class="popExchange_gift2">
+      <span class="popExchange_coin" style="font-size: 13px; margin-left: 5px">Fee (Service Charge %)</span>
+      <!-- <span class="popExchange_quantity">| {{serviceChar*100}} |</span> -->
+      <span class="popExchange_monney">{{ utils.formatMoney(currentOrderInBill.cart.svfee) }}</span>
+    </div>
+    <div class="row od_row_total">
+      <div class="col col-70">Total(VNĐ)</div>
+      <div class="col col-30 od_p_money">{{utils.formatMoney(currentOrderInBill.cart.subTotal + currentOrderInBill.cart.svfee)}}</div>
+    </div>
+    <!-- <div class="row">
+      <div class="col col-70">Saved</div>
+      <div class="col col-30 od_p_money">{{utils.formatMoney(order.discprice)}}</div>
+    </div> -->
+    <div class="od_sperateline"></div>
+    <div class="col od_thankyou">Thank you for shopping with us</div>
+    <div class="viewbill_btn_bill" ng-click="bill()">Print</div>
+  </div>
+  
+</div>

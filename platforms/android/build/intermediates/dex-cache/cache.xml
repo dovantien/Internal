@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        jar="/Users/developer/Desktop/Tien/HelioIonic_service2/HelioInternal/platforms/android/build/intermediates/exploded-aar/android/CordovaLib/unspecified/debug/jars/classes.jar"
+        jumboMode="false"
+        revision="23.0.3"
+        sha1="c62cf1c1988748f7cdd71d51407869b4559a7726">
+        <dex dex="/Users/developer/Desktop/Tien/HelioIonic_service2/HelioInternal/platforms/android/build/intermediates/pre-dexed/debug/CordovaLib-unspecified-debug_0e3bc2bbc0c4c2b936121a240d71ac39ff2cac47.jar" />
+    </item>
+    <item
+        jar="/Users/developer/Desktop/Tien/HelioIonic_service2/HelioInternal/platforms/android/build/intermediates/exploded-aar/android/CordovaLib/unspecified/release/jars/classes.jar"
+        jumboMode="false"
+        revision="23.0.3"
+        sha1="8deacedb26105d8294bef60e89dad536c6cbde43">
+        <dex dex="/Users/developer/Desktop/Tien/HelioIonic_service2/HelioInternal/platforms/android/build/intermediates/pre-dexed/release/CordovaLib-unspecified-release_550094591bf7ca6050bcd6ed5d4a22f667ac5ef7.jar" />
+    </item>
+
+</items>

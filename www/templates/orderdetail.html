@@ -1,0 +1,26 @@
+<ion-modal-view id="oderdetailModal" class="ion-nifty-modal">
+  <div class="ion-modal-content-custom">
+    <ion-header-bar style="background: red;">
+      <h1 class="title" style="color: white;font-weight: bold;text-align: center;">{{listTable.selected.shoptablename}}</h1>
+      <img class="pop_1_close2" src="img/popup/btn_close.png" ng-click="closeModal()">
+    </ion-header-bar>
+    <ion-content style="height: 82%">
+      <div ng-repeat="x in edittingOrder.listProd track by $index" style="padding: 10px; position: relative;border-bottom: solid 1px red;" ng-click="clickEditOrder(x,$index)">
+        <img src="{{x.prodimg}}" class="orderdetail_img">
+        <div class="orderdetail_prod_name">{{x.prodname}}</div>
+        <div style="position: absolute;
+    top: 40px;
+    left: 125px;">
+          <div ng-repeat="item in x.options">
+            {{item.opttypename}}: {{item.selected.optdetailname}}
+          </div>
+        </div>
+        <!-- <div class="orderdetail_btn_edit" ng-click="clickEditOrder(x,$index)">Sửa</div> -->
+        <div class="orderdetail_btn_delete" ng-click="clickDelete(x, $index)">Xóa</div>
+      </div>
+      <div style="height: 45px"></div>
+    </ion-content>
+    <div class="orderdetail_btn_clear" ng-click="clear()">Clear All</div>
+    <div class="orderdetail_btn_order" ng-click="doOrder()">Order</div>
+  </div>
+</ion-modal-view>

@@ -1,0 +1,26 @@
+[
+    {
+        "merged": "/Users/developer/Desktop/Tien/HelioIonic_service2/HelioInternal/platforms/android/build/intermediates/res/merged/debug/layout/select_printer_activity.xml",
+        "source": "/Users/developer/Desktop/Tien/HelioIonic_service2/HelioInternal/platforms/android/res/layout/select_printer_activity.xml"
+    },
+    {
+        "merged": "/Users/developer/Desktop/Tien/HelioIonic_service2/HelioInternal/platforms/android/build/intermediates/res/merged/debug/layout/actionbar_discard_button.xml",
+        "source": "/Users/developer/Desktop/Tien/HelioIonic_service2/HelioInternal/platforms/android/res/layout/actionbar_discard_button.xml"
+    },
+    {
+        "merged": "/Users/developer/Desktop/Tien/HelioIonic_service2/HelioInternal/platforms/android/build/intermediates/res/merged/debug/layout/printer_list_item.xml",
+        "source": "/Users/developer/Desktop/Tien/HelioIonic_service2/HelioInternal/platforms/android/res/layout/printer_list_item.xml"
+    },
+    {
+        "merged": "/Users/developer/Desktop/Tien/HelioIonic_service2/HelioInternal/platforms/android/build/intermediates/res/merged/debug/layout/actionbar_custom_view_done_discard.xml",
+        "source": "/Users/developer/Desktop/Tien/HelioIonic_service2/HelioInternal/platforms/android/res/layout/actionbar_custom_view_done_discard.xml"
+    },
+    {
+        "merged": "/Users/developer/Desktop/Tien/HelioIonic_service2/HelioInternal/platforms/android/build/intermediates/res/merged/debug/layout/multiselectorgrid.xml",
+        "source": "/Users/developer/Desktop/Tien/HelioIonic_service2/HelioInternal/platforms/android/res/layout/multiselectorgrid.xml"
+    },
+    {
+        "merged": "/Users/developer/Desktop/Tien/HelioIonic_service2/HelioInternal/platforms/android/build/intermediates/res/merged/debug/layout/actionbar_done_button.xml",
+        "source": "/Users/developer/Desktop/Tien/HelioIonic_service2/HelioInternal/platforms/android/res/layout/actionbar_done_button.xml"
+    }
+]

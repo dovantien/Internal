@@ -1,0 +1,22 @@
+
+<ion-modal-view >
+  <ion-header-bar style="background: red;">
+    <h1 class="title" style="color: white;font-weight: bold;">Chi tiết order {{listTable.selected.shoptablename}}</h1>
+    <img class="pop_1_close2" src="img/popup/btn_close.png" ng-click="closeModal()">
+  </ion-header-bar>
+  <ion-content style="height: 82%" >
+    <div ng-repeat="x in edittingOrder" style="padding: 10px; position: relative;border-bottom: solid 1px red;">
+      <img src="{{x.prodimg}}" style="width: 100px;border: solid 1px;border-radius: 5px;">
+      <div class="orderdetail_prod_name">{{x.prodname}}</div>
+      <div style="position: absolute;top: 40px;left: 125px;">
+        <div ng-repeat="item in x.options">
+          {{item.opttypename}}: {{item.selected.optdetailname}}
+        </div>
+      </div>
+      <div class="orderdetail_btn_edit" ng-click="clickEditOrder(x,$index)" ng-if="x.prodstat==1">Sửa</div>
+    </div>
+    <div style="height: 45px"></div>
+  </ion-content>
+  <div class="orderdetail_btn_clear" ng-click="closeModal()">Cancel</div>
+  <div class="orderdetail_btn_order" ng-click="doOrder()">Order</div>
+</ion-modal-view>

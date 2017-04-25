@@ -1,0 +1,43 @@
+<ion-view view-title="Danh sách sản phẩm order" align-title="right">
+  <img src="img/BG_login.jpg" style="width: 100%;height: 100%">
+  <ion-content class="content_right_barorder" has-bouncing="false">
+    <div ng-repeat="x in listBarOrder" class="content_right_barorder_item" ng-click="getListOrderDetail(x.product.prodid)" ng-style="(x.product.prodid == selectedProd ? {backgroundColor:'red',color:'white'} : {backgroundColor:'none',color:'black'})">
+      <div class="content_right_barorder_name">
+        {{x.product.prodname}}
+      </div>
+      <div class="content_right_barorder_numb">
+        Số lượng {{x.product.prodnumb}}
+      </div>
+      <div class="content_right_barorder_numb">
+        {{utils.formatDateView(x.product.ordertime)}}
+      </div>
+    </div>
+  </ion-content>
+  <ion-content class="content_left_barorder" has-bouncing="false" delegate-handle="bar_left_content">
+    <div ng-repeat="x in listOrderDetail" class="content_left_barorder_item" ng-click="completeProduce(x,$index)">
+      <div class="content_left_barorder_stt">{{$index + 1}}</div>
+      <div class="content_left_barorder_name">
+        {{x.prodname}} (#{{x.cartnumb}})
+      </div>
+      <div class="content_left_barorder_table">
+        {{x.shoptablename}} -
+        <span style="color:blue">{{x.username}}</span>
+      </div>
+      <div class="content_left_barorder_table" style="top:30%">
+        {{utils.formatDateView(x.ordertime)}}
+      </div>
+      <div class="content_left_barorder_option1" ng-if="x.Option1">
+        - {{x.Option1}}
+      </div>
+      <div class="content_left_barorder_option2" ng-if="x.Option2">
+        - {{x.Option2}}
+      </div>
+      <div class="content_left_barorder_option3" ng-if="x.Option3">
+        - {{x.Option3}}
+      </div>
+      <!-- <div class="content_left_barorder_btn" ng-click="completeProduce(x,$index)">
+        Hoàn thành
+      </div> -->
+    </div>
+  </ion-content>
+</ion-view>

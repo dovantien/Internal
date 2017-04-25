@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+  <title></title>
+  <link rel="manifest" href="manifest.json">
+  <!-- un-comment this code to enable service worker
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('service-worker.js')
+          .then(() => console.log('service worker installed'))
+          .catch(err => console.log('Error', err));
+      }
+    </script>-->
+  <link href="lib/ionic/css/ionic.css" rel="stylesheet">
+  <link href="css/style.css" rel="stylesheet">
+  <link href="css/animate.css" rel="stylesheet">
+  <link href="css/tabSlideBox.css" rel="stylesheet">
+  <link href="css/nifty.modal.css" rel="stylesheet">
+  <!-- IF using Sass (run gulp sass first), then uncomment below and remove the CSS includes above
+    <link href="css/ionic.app.css" rel="stylesheet">
+    -->
+  <!-- ionic/angularjs js -->
+  <script src="lib/bluebird.min.js"></script>
+  <script src="lib/ionic/js/ionic.bundle.js"></script>
+  <script src="lib/ionic.cloud.min.js"></script>
+  <!-- cordova script (this will be a 404 during development) -->
+  <script src="cordova.js"></script>
+  <!-- your app's js -->
+  <script src="js/app.js"></script>
+  <script src="js/controllers.js"></script>
+  <script src="js/controllers/AuthController.js"></script>
+  <script src="js/controllers/OrderController.js"></script>
+  <script src="js/controllers/BarOrderController.js"></script>
+  <script src="js/controllers/OrderHistoryController.js"></script>
+  <script src="js/controllers/CashierController.js"></script>
+  <!-- services -->
+  <script src="js/services/APIService.js"></script>
+  <script src="js/services/UtilsService.js"></script>
+  <script src="js/services/UserService.js"></script>
+  <script src="js/services/ClosePopupService.js"></script>
+  <script src="js/services/PopupService.js"></script>
+  <!-- lib -->
+  <script src="lib/tienlib/accounting.js"></script>
+  <script src="lib/tienlib/locstor.js"></script>
+  <script src="lib/tienlib/moment.js"></script>
+  <script src="lib/tienlib/DefineConfig.js"></script>
+  <script src="lib/tienlib/socket.io.js"></script>
+  <script src="lib/tienlib/angular.audio.js"></script>
+  <script src="lib/angular-md5.js"></script>
+  <script src="lib/tienlib/ng-cordova.min.js"></script>
+  <script src="lib/tienlib/tabSlideBox.js"></script>
+  <script src="lib/tienlib/ionic-image-lazy-load.js"></script>
+</head>
+
+<body ng-app="starter" class="platform-android platform-cordova platform-webview">
+  <ion-nav-view></ion-nav-view>
+</body>
+
+</html>

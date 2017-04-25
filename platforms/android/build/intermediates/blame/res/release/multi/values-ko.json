@@ -1,0 +1,197 @@
+[
+    {
+        "outputFile": "/Users/developer/Desktop/Tien/HelioIonic_service2/HelioInternal/platforms/android/build/intermediates/res/merged/release/values-ko/values-ko.xml",
+        "map": [
+            {
+                "to": {
+                    "startLine": 2,
+                    "startColumn": 4,
+                    "startOffset": 55,
+                    "endColumn": 42,
+                    "endOffset": 93
+                },
+                "from": {
+                    "file": "/Users/developer/Desktop/Tien/HelioIonic_service2/HelioInternal/platforms/android/res/values-ko/multiimagechooser_strings_ko.xml",
+                    "position": {
+                        "startLine": 10,
+                        "startColumn": 4,
+                        "startOffset": 669,
+                        "endColumn": 42,
+                        "endOffset": 707
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 3,
+                    "startColumn": 4,
+                    "startOffset": 98,
+                    "endColumn": 35,
+                    "endOffset": 129
+                },
+                "from": {
+                    "file": "/Users/developer/Desktop/Tien/HelioIonic_service2/HelioInternal/platforms/android/res/values-ko/multiimagechooser_strings_ko.xml",
+                    "position": {
+                        "startLine": 11,
+                        "startColumn": 4,
+                        "startOffset": 712,
+                        "endColumn": 35,
+                        "endOffset": 743
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 4,
+                    "startColumn": 4,
+                    "startOffset": 134,
+                    "endColumn": 82,
+                    "endOffset": 212
+                },
+                "from": {
+                    "file": "/Users/developer/Desktop/Tien/HelioIonic_service2/HelioInternal/platforms/android/res/values-ko/multiimagechooser_strings_ko.xml",
+                    "position": {
+                        "startLine": 4,
+                        "startColumn": 4,
+                        "startOffset": 182,
+                        "endColumn": 82,
+                        "endOffset": 260
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 5,
+                    "startColumn": 4,
+                    "startOffset": 217,
+                    "endColumn": 65,
+                    "endOffset": 278
+                },
+                "from": {
+                    "file": "/Users/developer/Desktop/Tien/HelioIonic_service2/HelioInternal/platforms/android/res/values-ko/multiimagechooser_strings_ko.xml",
+                    "position": {
+                        "startLine": 3,
+                        "startColumn": 4,
+                        "startOffset": 116,
+                        "endColumn": 65,
+                        "endOffset": 177
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 6,
+                    "startColumn": 4,
+                    "startOffset": 283,
+                    "endColumn": 78,
+                    "endOffset": 357
+                },
+                "from": {
+                    "file": "/Users/developer/Desktop/Tien/HelioIonic_service2/HelioInternal/platforms/android/res/values-ko/multiimagechooser_strings_ko.xml",
+                    "position": {
+                        "startLine": 8,
+                        "startColumn": 4,
+                        "startOffset": 485,
+                        "endColumn": 78,
+                        "endOffset": 559
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 7,
+                    "startColumn": 4,
+                    "startOffset": 362,
+                    "endColumn": 104,
+                    "endOffset": 462
+                },
+                "from": {
+                    "file": "/Users/developer/Desktop/Tien/HelioIonic_service2/HelioInternal/platforms/android/res/values-ko/multiimagechooser_strings_ko.xml",
+                    "position": {
+                        "startLine": 9,
+                        "startColumn": 4,
+                        "startOffset": 564,
+                        "endColumn": 104,
+                        "endOffset": 664
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 8,
+                    "startColumn": 4,
+                    "startOffset": 467,
+                    "endColumn": 60,
+                    "endOffset": 523
+                },
+                "from": {
+                    "file": "/Users/developer/Desktop/Tien/HelioIonic_service2/HelioInternal/platforms/android/res/values-ko/multiimagechooser_strings_ko.xml",
+                    "position": {
+                        "startLine": 2,
+                        "startColumn": 4,
+                        "startOffset": 55,
+                        "endColumn": 60,
+                        "endOffset": 111
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 9,
+                    "startColumn": 4,
+                    "startOffset": 528,
+                    "endColumn": 70,
+                    "endOffset": 594
+                },
+                "from": {
+                    "file": "/Users/developer/Desktop/Tien/HelioIonic_service2/HelioInternal/platforms/android/res/values-ko/multiimagechooser_strings_ko.xml",
+                    "position": {
+                        "startLine": 6,
+                        "startColumn": 4,
+                        "startOffset": 332,
+                        "endColumn": 70,
+                        "endOffset": 398
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 10,
+                    "startColumn": 4,
+                    "startOffset": 599,
+                    "endColumn": 81,
+                    "endOffset": 676
+                },
+                "from": {
+                    "file": "/Users/developer/Desktop/Tien/HelioIonic_service2/HelioInternal/platforms/android/res/values-ko/multiimagechooser_strings_ko.xml",
+                    "position": {
+                        "startLine": 7,
+                        "startColumn": 4,
+                        "startOffset": 403,
+                        "endColumn": 81,
+                        "endOffset": 480
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 11,
+                    "startColumn": 4,
+                    "startOffset": 681,
+                    "endColumn": 66,
+                    "endOffset": 743
+                },
+                "from": {
+                    "file": "/Users/developer/Desktop/Tien/HelioIonic_service2/HelioInternal/platforms/android/res/values-ko/multiimagechooser_strings_ko.xml",
+                    "position": {
+                        "startLine": 5,
+                        "startColumn": 4,
+                        "startOffset": 265,
+                        "endColumn": 66,
+                        "endOffset": 327
+                    }
+                }
+            }
+        ]
+    }
+]

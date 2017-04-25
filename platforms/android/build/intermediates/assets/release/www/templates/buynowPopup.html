@@ -1,0 +1,42 @@
+﻿<div has-bouncing="false" style="height:100%">
+    <div class="od_header">
+        <div class="od_restname">Helio Bà Triệu<!--{{ordershop.restname}}--></div>
+        <div class="od_timedelivery">2016-11-14<!--{{editingOrder.timedelivery}}--></div>
+        <div class="od_timereceive">(Thời gian nhận hàng)</div>
+        
+        
+        <div class="od_sperateline"></div>
+    </div>
+    <div class="od_list_product">
+            <div class="popExchange_gift2" ng-repeat="item in edittingOrder.listProductOrder">
+                <span class="popExchange_coin" style="font-size: 13px">{{item.prodname}}</span>
+                <span class="popExchange_quantity">| {{item.quantity}} |</span>
+                <span class="popExchange_monney">{{ utils.formatMoney(item.prodprice * item.quantity) }}</span>
+            </div>
+        </div>
+    </div>
+    <div class="od_footer">
+    <div class="od_sperateline"></div>
+
+    <div class="row od_row_total">
+        <div class="col col-70">Tổng tiền(VNĐ)</div>
+        <div class="col col-30 od_p_money">22.000<!--{{utils.formatMoney(order.promprice+order.svfee)}}--></div>
+    </div>
+    <div class="row">
+        <div class="col col-70">Saved</div>
+        <div class="col col-30 od_p_money">23.000<!--{{utils.formatMoney(order.discprice)}}--></div>
+    </div>
+    <div class="od_sperateline"></div>
+        <textarea class="popupFeedBack_desc" placeholder="Lưu ý..." style="margin-bottom: 56px;
+    width: 94%;
+    margin-left: 3%;"></textarea>
+</div>
+      
+    <div >
+        <img src="img/11.png" class="popExchange_bottom_backgroud" />
+        <img src="img/22.png" class="popExchange_bottom_ngang" />
+        <img src="img/doc.png" class="popExchange_bottom_doc" />
+        <div class="popExchange_btn_left" ng-click="closeDetailPopupClick()">Cancel</div>
+        <div class="popExchange_btn_right" ng-click="doOrder()">Order Now</div>
+    </div>
+

@@ -1,0 +1,57 @@
+<ion-view view-title="Danh sách sản phẩm order" align-title="right">
+  <img src="img/barbg.jpg" style="width: 100%;height: 100%">
+  <ion-content has-bouncing="false" delegate-handle="history_list" overflow-scroll = "true">
+    <ion-list has-bouncing="false">
+      <ion-item collection-repeat="item in listOrderComplete" class="item odh_item odh_item_status_{{item.cartstatus}}" ng-click="getOrderCompleteDetail(item.cart.cartid)">
+        <div class="orderdetail_stt" ng-style="item.cart.cartstat==3 ? {background:'green'} : {background:'-webkit-linear-gradient(#ff4700, #fb9700)'} ">{{$index + 1}}</div>
+        <div class="row">
+          <div class="col col-50 odh_cartnumb">#{{item.cart.cartnumb}}</div>
+          <div class="col col-50 odh_timeorder">- {{item.products[0].prodnum}} {{item.products[0].prodname}}</div>
+        </div>
+        <div class="row">
+          <div class="col col-50 odh_cartshop">
+            {{item.cart.shoptablename}} - 
+            <span style="color:blue">{{item.products[0].username}}</span>
+          </div>
+          <div class="col col-50 odh_timeorder" ng-if="item.products[1]">- {{item.products[1].prodnum}} {{item.products[1].prodname}}</div>
+        </div>
+        <div class="row">
+          <div class="col col-50 odh_status">{{(item.cart.cartstatname)}}</div>
+          <div class="col col-50 odh_timeorder" ng-if="item.products[2]">- {{item.products[2].prodnum}} {{item.products[2].prodname}}</div>
+        </div>
+        <div class="row">
+          <div class="col col-50 odh_timeorder">{{utils.formatDateView(item.cart.ordertime)}}</div>
+          <div class="col col-50 odh_cartshop" ng-if="item.products[3]"> ...</div>
+        </div>
+      </ion-item>
+    </ion-list>
+  </ion-content>
+  <div class="animated fadeIn" style="position: absolute;height: 100%;width: 100%;background: rgba(0, 0, 0, 0.4);top:0px;" ng-if="isShowOrderDetail">
+    <div style="width: 100%;height: 100%;background: transparent;position: relative;">
+      <div class="orderdetail_popup" id="oderdetailModal">
+        <h1 class="orderdetail_popup_title" style="color: white;font-weight: bold;">Chi tiết order</h1>
+        <img class="pop_1_close2" src="img/popup/btn_close.png" ng-click="closePopup()">
+        <ion-content style="height: 82%">
+          <div ng-repeat="x in orderCompleteDetail.products track by $index" style="padding: 10px; position: relative;border-bottom: solid 1px red;" ng-click="clickEditOrder(x,$index)">
+            <img src="{{x.prodimg}}" class="orderdetail_img">
+            <div class="orderdetail_prod_name" style="font-weight: bold;">{{x.prodname}}</div>
+            <div class="orderdetail_prod_name" style="color: black;top:37px;">{{x.shopchairname}}</div>
+            <div class="orderdetail_prod_name" style="color: black;top:56px;">Price: {{utils.formatMoney(x.price)}}</div>
+            <div class="orderdetail_prod_name" style="color: black;top:76px;">Svfee {{utils.formatMoney(x.svfee)}}</div>
+            <div class="orderdetail_prod_stat_{{x.prodstat}}">{{x.prodstatname}}</div>
+            <ion-checkbox ng-model="x.isChecked" style="position: absolute;top: 9px;right: 10px;width: 50px;border: none"></ion-checkbox>
+          </div>
+          <div style="height: 45px"></div>
+        </ion-content>
+        <div class="orderdetail_btn_clear" ng-click="doPay()">Pay</div>
+        <div class="orderdetail_btn_order" ng-click="viewBill()">Print</div>
+      </div>
+      <div ng-click="closePopup()" style="height: 100%;
+    width: 100%;
+    position: absolute;
+    background: red;
+    z-index: 1;
+    background: transparent;"></div>
+    </div>
+  </div>
+</ion-view>

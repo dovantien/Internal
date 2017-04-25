@@ -1,0 +1,98 @@
+<ion-view view-title="Order" align-title="right">
+  <div class="order_div_detail">
+    <ion-content class="order_log_editting" delegate-handle="mainScroll" ng-click="clickOrderDetail()">
+      <div ng-repeat="x in edittingOrder.listProd track by $index" style="border-bottom: solid 1px #989494;">
+        {{$index+1}}.
+        <span style="font-weight: bold">
+        {{x.prodname}}: 
+      </span>
+        <span ng-repeat="item in x.options">
+        {{item.opttypename}}
+        <span style="text-transform: lowercase;" ng-if="$index<x.options.length-1"> {{item.selected.optdetailname}},</span>
+        <span style="text-transform: lowercase;" ng-if="$index>=x.options.length-1"> {{item.selected.optdetailname}}</span>
+        </span>
+      </div>
+      <div style="height:30px;text-align: center;"></div>
+    </ion-content>
+    <div class="order_div_userinfo">
+      <div class="order_username">{{user.username}}</div>
+      <div class="order_userid">Mã số: {{user.userid}}</div>
+    </div>
+    <button ng-click="clickChooseTable()" class="button_right_bottom_bar" id="shoporder" style="top:99px;right: 3%;width: 28%;height: 70px;text-align: center;font-weight: bold;font-size: 18px" ng-style="listTable.selected == null ? {background:'yellow'}:{background:'white'}">
+      <img src="img/arrow_down.png" class="button_right_bottom_img" /> {{listTable.selected.shoptablename}}
+    </button>
+    <!-- <button ng-click="clickOrderDetail()" class="button_right_bottom_bar" style="width: 13%; height:70px; position:absolute; top:99px; right:3%; color:white; font-size:13px; font-weight:bold; font-size:14px; background-color: red; text-align: center;">ORDER
+    </button> -->
+  </div>
+  <tab-slide-box>
+    <div class="tsb-icons">
+      <div class="tsb-ic-wrp">
+        <ion-scroll direction="x" class="tsb-hscroll">
+          <a href="javascript:;" ng-repeat="tab in listCategory" on-finish-render="initSlide()">{{tab.catename}}</a>
+        </ion-scroll>
+      </div>
+    </div>
+    <ion-slide-box show-pager="false" on-slide-changed="slideHasChanged($index)" delegate-handle="image-viewer">
+      <ion-slide ng-repeat="item in listCategory">
+        <div style="width: 90%;">
+          <ion-content class="listProductStyle" has-bouncing="false">
+            <div ng-repeat="x in goTabsCate(item)" ng-if="$index%3==0" style="display: -webkit-box; margin-top: 2%;">
+              <div class="order_prod_col" ng-if="$index<listProd.length" ng-click="showProdOption(goTabsCate(item)[$index])">
+                <img src={{listProd[$index].prodimg}} class="order_prod_img">
+                <div class="order_prod_name_contains">
+                  <div class="order_prod_name">{{listProd[$index].prodname}} </div>
+                  <div class="order_prod_price">{{utils.formatMoney(listProd[$index].prodprice)}} </div>
+                </div>
+              </div>
+              <div class="order_prod_col" ng-if="$index+1<listProd.length" ng-click="showProdOption(goTabsCate(item)[$index+1])">
+                <img src={{listProd[$index+1].prodimg}} class="order_prod_img">
+                <div class="order_prod_name_contains">
+                  <div class="order_prod_name">{{listProd[$index+1].prodname}} </div>
+                  <div class="order_prod_price">{{utils.formatMoney(listProd[$index+1].prodprice)}} </div>
+                </div>
+              </div>
+              <div class="order_prod_col" ng-if="$index+2<listProd.length" ng-click="showProdOption(goTabsCate(item)[$index+2])">
+                <img src={{listProd[$index+2].prodimg}} class="order_prod_img">
+                <div class="order_prod_name_contains">
+                  <div class="order_prod_name">{{listProd[$index+2].prodname}} </div>
+                  <div class="order_prod_price">{{utils.formatMoney(listProd[$index+2].prodprice)}} </div>
+                </div>
+              </div>
+            </div>
+          </ion-content>
+        </div>
+      </ion-slide>
+    </ion-slide-box>
+  </tab-slide-box>
+  <!-- popup detail order -->
+  <div class="animated fadeIn" style="position: absolute;height: 100%;width: 100%;background: rgba(0, 0, 0, 0.4);top:0px;" ng-if="isShowOrderDetail">
+    <div style="width: 100%;height: 100%;background: transparent;position: relative;">
+      <div class="orderdetail_popup" id="oderdetailModal">
+        <h1 class="orderdetail_popup_title">{{listTable.selected.shoptablename}}</h1>
+        <img class="pop_1_close2" src="img/popup/btn_close.png" ng-click="closePopup()">
+        <ion-content style="height: 82%">
+          <div ng-repeat="x in edittingOrder.listProd track by $index" style="padding: 10px; position: relative;border-bottom: solid 1px red;width: 100%">
+            <div style=" position: absolute;width: 100%;height: 100%;top: 0;left: 0;z-index: 100" ng-click="clickEditOrder(x,$index)"></div>
+            <img src="{{x.prodimg}}" class="orderdetail_img">
+            <div class="orderdetail_prod_name">{{x.prodname}}</div>
+            <div style="position: absolute;top: 40px;left: 125px;width: 60%">
+              <div ng-repeat="item in x.options">
+                {{item.selected.optdetailname}}
+              </div>
+            </div>
+            <div class="orderdetail_btn_delete" ng-click="clickDelete(x, $index)">Xóa</div>
+          </div>
+          <!-- <div style="height: 45px"></div> -->
+        </ion-content>
+        <div class="orderdetail_btn_clear" ng-click="closePopup()">Cancel</div>
+        <div class="orderdetail_btn_order" ng-click="doOrder()">Order</div>
+      </div>
+      <div style="height: 100%;
+    width: 100%;
+    position: absolute;
+    background: red;
+    z-index: 1;
+    background: transparent;"></div>
+    </div>
+  </div>
+</ion-view>

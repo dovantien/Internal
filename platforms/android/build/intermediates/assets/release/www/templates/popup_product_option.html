@@ -1,0 +1,27 @@
+<div has-bouncing="false" style="height:100%" scroll="false">
+  <div>
+    <div class="option_prodname">{{prodOptions.prod.prodname}}</div>
+    <div ng-repeat="x in prodOptions" style="padding-left: 10%;padding-top: 5%;position: relative; display: -webkit-box">
+      <div class="option_type_name">
+        {{x.opttypename}}
+      </div>
+      <div class="option_type_input listOption" ng-click="show(x)">
+        <div class="option_type_input_name">{{x.selected.optdetailname}}</div>
+        <img src="img/arrow_down.png" class="option_type_input_img">
+        <div style="position: fixed;
+    right: 2.5%;
+    z-index: 99;
+    background: white;
+    width: 40%;
+    margin-top: 1%;
+    border: solid 2px;
+    border-radius: 5px;" ng-show="x.isShow">
+          <div class="item-accordion" ng-repeat="item in x.option" ng-show="x.isShow" ng-click="clickChooseOption(x,item)" ng-style="x.selected==item?{background:'#ffd0a3'}:{background:'white'}">
+            {{item.optdetailname}}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="option_button_OK" ng-click="addProductToOder()">OK</div>
+</div>

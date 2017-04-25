@@ -1,0 +1,32 @@
+<div has-bouncing="false" style="height:100%">
+  <div style="    position: relative;">
+    <!-- <img src="img/chonban.png" class="option_img"> -->
+    <!-- <img class="pop_1_close2" src="img/popup/btn_close.png" ng-click="closeDetailPopupClick()"> -->
+    <div class="option_prodname">Danh sách chọn bàn</div>
+  </div>
+  <div>
+    <div ng-repeat="x in listTable.list" ng-if="$index % 4 == 0" style="display: -webkit-box;height: 37px;line-height: 35px; margin-top: 5%">
+      <div class="tabledetail_col" ng-if='$index < listTable.list.length' style="" ng-click="chooseTable($index)">
+        <div class="tabledetail_col_chirld" ng-style="listTable.selected == listTable.list[$index] ? {background:'#5a3510'} : {background:'#975d24'}">
+          {{listTable.list[$index].shoptablename}}
+        </div>
+      </div>
+      <div class="tabledetail_col" ng-if='$index + 1 < listTable.list.length' style="" ng-click="chooseTable($index + 1)">
+        <div class="tabledetail_col_chirld" ng-style="listTable.selected == listTable.list[$index+1] ? {background:'#5a3510'} : {background:'#975d24'}">
+          {{listTable.list[$index+1].shoptablename}}
+        </div>
+      </div>
+      <div class="tabledetail_col" ng-if='$index + 2< listTable.list.length' style="" ng-click="chooseTable($index + 2)">
+        <div class="tabledetail_col_chirld" ng-style="listTable.selected == listTable.list[$index+2] ? {background:'#5a3510'} : {background:'#975d24'}">
+          {{listTable.list[$index+2].shoptablename}}
+        </div>
+      </div>
+      <div class="tabledetail_col" ng-if='$index + 3 < listTable.list.length' style="" ng-click="chooseTable($index + 3)">
+        <div class="tabledetail_col_chirld" ng-style="listTable.selected == listTable.list[$index+3] ? {background:'#5a3510'} : {background:'#975d24'}">
+          {{listTable.list[$index+3].shoptablename}}
+        </div>
+      </div>
+    </div>
+    <div style="margin-bottom: 5%;"></div>
+  </div>
+</div>

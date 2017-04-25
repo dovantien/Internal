@@ -1,0 +1,36 @@
+<div has-bouncing="false" style="height:100%" scroll="false">
+    <div>
+        <div class="option_prodname">{{prodOptions.prod.prodname}}</div>
+        <div ng-repeat="x in prodOptions" style="padding-left: 10%;padding-top: 5%;position: relative; display: -webkit-box; margin-bottom: 20px">
+            <div class="option_type_name">
+                {{x.opttypename}}
+            </div>
+            <div class="option_type_input listOption" ng-click="show(x)">
+                <div class="option_type_input_name">{{x.selected.optdetailname}}</div>
+                <img src="img/arrow_down.png" class="option_type_input_img">
+                <div class="option_showdetail" ng-show="x.isShow" ng-style="x.option.length > 10 ? {bottom:'-53%'} : {}">
+                <!-- show -->
+                    <div class="item-accordion" ng-repeat="item in x.option" ng-show="x.isShow" ng-click="clickChooseOption(x,item)" ng-style="x.selected==item?{background:'#ffd0a3'}:{background:'white'}">
+                        {{item.optdetailname}}
+                    </div>
+                </div>
+            </div>
+        </div>
+         <div style="display: inline;">
+            <button class="optionbutton ion-android-remove-circle" style="border: none;background: inherit;" ng-click=" quantity_product <1 ?quantity_product=0: quantity_product = quantity_product - 1"></button>
+            <input class="optioninput" ng-model="quantity_product" tyle="number" min="1" max="99" style="
+            width: 23%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    text-align: center;
+    font-weight: bold;
+    font-size: xx-large;" placeholder="{{quantity_product}}">
+            <button class="optionbutton ion-android-add-circle" style="border: none;background: inherit;margin-left: 0%" ng-click="quantity_product = quantity_product + 1"></button>
+        </div>
+    </div>
+    <!-- <div class=" button button-assertive-OK" ng-click="addProductToOder(quantity_product)">OK</div> -->
+</div>
