@@ -1,6 +1,10 @@
 [
     {
-        "merged": "/Users/developer/Desktop/Tien/HelioIonic_service2/HelioInternal/platforms/android/build/intermediates/res/merged/debug/xml/config.xml",
-        "source": "/Users/developer/Desktop/Tien/HelioIonic_service2/HelioInternal/platforms/android/res/xml/config.xml"
+        "merged": "C:\\Users\\Admin\\Documents\\helio_mobile_client\\HelioInternal\\platforms\\android\\build\\intermediates\\res\\merged\\debug\\xml\\preferences.xml",
+        "source": "C:\\Users\\Admin\\Documents\\helio_mobile_client\\HelioInternal\\platforms\\android\\build\\intermediates\\exploded-aar\\barcodescanner\\res\\xml\\preferences.xml"
+    },
+    {
+        "merged": "C:\\Users\\Admin\\Documents\\helio_mobile_client\\HelioInternal\\platforms\\android\\build\\intermediates\\res\\merged\\debug\\xml\\config.xml",
+        "source": "C:\\Users\\Admin\\Documents\\helio_mobile_client\\HelioInternal\\platforms\\android\\res\\xml\\config.xml"
     }
 ]

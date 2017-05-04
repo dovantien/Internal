@@ -7,33 +7,36 @@
         "files": {}
     },
     "installed_plugins": {
-        "cordova-plugin-vibration": {
-            "PACKAGE_NAME": "com.ionicframework.heliointernal994382"
-        },
-        "cordova-plugin-nativeaudio": {
-            "PACKAGE_NAME": "com.ionicframework.heliointernal994382"
-        },
-        "cordova-plugin-geolocation": {
-            "PACKAGE_NAME": "com.ionicframework.heliointernal994382"
-        }
-    },
-    "dependent_plugins": {
-        "cordova-plugin-console": {
-            "PACKAGE_NAME": "com.ionicframework.heliointernal994382"
-        },
         "cordova-plugin-device": {
             "PACKAGE_NAME": "com.ionicframework.heliointernal994382"
         },
         "cordova-plugin-file": {
             "PACKAGE_NAME": "com.ionicframework.heliointernal994382"
         },
-        "cordova-plugin-file-transfer": {
+        "cordova-plugin-geolocation": {
+            "PACKAGE_NAME": "com.ionicframework.heliointernal994382"
+        },
+        "cordova-plugin-nativeaudio": {
             "PACKAGE_NAME": "com.ionicframework.heliointernal994382"
         },
         "cordova-plugin-splashscreen": {
             "PACKAGE_NAME": "com.ionicframework.heliointernal994382"
         },
         "cordova-plugin-statusbar": {
+            "PACKAGE_NAME": "com.ionicframework.heliointernal994382"
+        },
+        "cordova-plugin-vibration": {
+            "PACKAGE_NAME": "com.ionicframework.heliointernal994382"
+        }
+    },
+    "dependent_plugins": {
+        "cordova-plugin-compat": {
+            "PACKAGE_NAME": "com.ionicframework.heliointernal994382"
+        },
+        "cordova-plugin-console": {
+            "PACKAGE_NAME": "com.ionicframework.heliointernal994382"
+        },
+        "cordova-plugin-file-transfer": {
             "PACKAGE_NAME": "com.ionicframework.heliointernal994382"
         },
         "cordova-plugin-whitelist": {
@@ -46,9 +49,6 @@
             "PACKAGE_NAME": "com.ionicframework.heliointernal994382"
         },
         "ionic-plugin-keyboard": {
-            "PACKAGE_NAME": "com.ionicframework.heliointernal994382"
-        },
-        "cordova-plugin-compat": {
             "PACKAGE_NAME": "com.ionicframework.heliointernal994382"
         }
     }

@@ -1,6 +1,18 @@
 [
     {
-        "merged": "/Users/developer/Desktop/Tien/HelioIonic_service2/HelioInternal/platforms/android/build/intermediates/res/merged/debug/drawable/grid_background.xml",
-        "source": "/Users/developer/Desktop/Tien/HelioIonic_service2/HelioInternal/platforms/android/res/drawable/grid_background.xml"
+        "merged": "C:\\Users\\Admin\\Documents\\helio_mobile_client\\HelioInternal\\platforms\\android\\build\\intermediates\\res\\merged\\debug\\drawable\\launcher_icon.png",
+        "source": "C:\\Users\\Admin\\Documents\\helio_mobile_client\\HelioInternal\\platforms\\android\\build\\intermediates\\exploded-aar\\barcodescanner\\res\\drawable\\launcher_icon.png"
+    },
+    {
+        "merged": "C:\\Users\\Admin\\Documents\\helio_mobile_client\\HelioInternal\\platforms\\android\\build\\intermediates\\res\\merged\\debug\\drawable\\share_via_barcode.png",
+        "source": "C:\\Users\\Admin\\Documents\\helio_mobile_client\\HelioInternal\\platforms\\android\\build\\intermediates\\exploded-aar\\barcodescanner\\res\\drawable\\share_via_barcode.png"
+    },
+    {
+        "merged": "C:\\Users\\Admin\\Documents\\helio_mobile_client\\HelioInternal\\platforms\\android\\build\\intermediates\\res\\merged\\debug\\drawable\\toggle_torch.png",
+        "source": "C:\\Users\\Admin\\Documents\\helio_mobile_client\\HelioInternal\\platforms\\android\\build\\intermediates\\exploded-aar\\barcodescanner\\res\\drawable\\toggle_torch.png"
+    },
+    {
+        "merged": "C:\\Users\\Admin\\Documents\\helio_mobile_client\\HelioInternal\\platforms\\android\\build\\intermediates\\res\\merged\\debug\\drawable\\flip_camera.png",
+        "source": "C:\\Users\\Admin\\Documents\\helio_mobile_client\\HelioInternal\\platforms\\android\\build\\intermediates\\exploded-aar\\barcodescanner\\res\\drawable\\flip_camera.png"
     }
 ]

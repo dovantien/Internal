@@ -200,6 +200,24 @@ angular.module('starter.services.APIService', [])
         }
       });
     };
+    var api_update_updatecachebill = function(apiData) {
+      apiData.userid = UserService.getUser().userid;
+      apiData.session = UserService.getUser().sessionkey;
+      return $http.post(proxyURL + '/updatecachebill', apiData).success(function(result) {
+        if(result.session != null){
+          updateSession(result.session);
+        }
+      });
+    };
+    var api_getcachebill = function(apiData) {
+      apiData.userid = UserService.getUser().userid;
+      apiData.session = UserService.getUser().sessionkey;
+      return $http.post(proxyURL + '/getcachebill', apiData).success(function(result) {
+        if(result.session != null){
+          updateSession(result.session);
+        }
+      });
+    };
 
 
     return {
@@ -229,6 +247,8 @@ angular.module('starter.services.APIService', [])
       api_writeLogFile:api_writeLogFile,
       api_set_autoPrint:api_set_autoPrint,
       api_set_AddPurchasedProductNewFunc:api_set_AddPurchasedProductNewFunc,
-      api_update_PrintStatus:api_update_PrintStatus
+      api_update_PrintStatus:api_update_PrintStatus,
+      api_update_updatecachebill:api_update_updatecachebill,
+      api_getcachebill:api_getcachebill
     };
   });

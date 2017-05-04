@@ -4,18 +4,27 @@ angular.module('starter.controllers.CashierController', [])
         console.log('CashierController');
         $scope.sound = ngAudio.load("sounds/noti.mp3");
         var request_id = 1;
-
+        var connectedSocket = 0;
         // $rootScope.isConnected = false;
         $rootScope.dockUrl = "ws://192.168.35.1:9876/ws/";
         var socket = io('http://mycafe.co:3011');
         socket.on('connected', function() {
             console.log('connected')
             $ionicLoading.hide();
-            getListOrderComplete();
+            // console.log('getListOrderComplete 1');
+            // getListOrderComplete();
             socket.emit('register', {
                 userid: UserService.getUser().userid,
                 shopid: UserService.getUser().shopid
             });
+
+             APIService.api_getcachebill({shopid: UserService.getUser().shopid }).then(function(result) {
+                                    console.log(JSON.stringify('api_getcachebill'));
+                                    console.log(JSON.stringify(result));
+                            }, function(err) {
+
+                            });
+
         });
         socket.on('register', function(data) {
             console.log(data);
@@ -24,7 +33,10 @@ angular.module('starter.controllers.CashierController', [])
         socket.on('reloadordercomplete', function(data) {
             console.log('reload list order');
             console.log(JSON.stringify(data));
-            if (data.result != null) {
+            // for(var i= 0 ; i< data.result.length; i++){
+
+            // }
+            if (data) {
                 AutoPrint(data);
             } else {
                 console.log(JSON.stringify(data));
@@ -42,14 +54,20 @@ angular.module('starter.controllers.CashierController', [])
             //     }
             // });
             // }
+            console.log('getListOrderComplete 2');
             getListOrderComplete();
             // APIService.api_get_barorder({ shopid: UserService.getUser().shopid })
             //     .then(function(result) {
             //         console.log(JSON.stringify(result));
             //     }, function(err) {});
         });
+        // socket.on('PongFromServer', function(data) {
+        //     // console.log('data :' + data);
+        //     $scope.data=data;
+        // });
         socket.on('disconnect', function(data) {
-            console.log('diss')
+            console.log('disconnect Socket')
+            connectedSocket = 0;
             console.log(JSON.stringify(data));
             $ionicLoading.show({
                 template: '<ion-spinner icon="bubbles"></ion-spinner><p>Kết Nối Internet có vấn đề ! </p>',
@@ -63,9 +81,8 @@ angular.module('starter.controllers.CashierController', [])
         socket.connect();
         //End In Bill
 
-
-
         function AutoPrint(data) {
+            console.log('Thuc hien in tu dong')
             $scope.Bill = {
                 cart: {
                     subTotal: 0,
@@ -113,11 +130,12 @@ angular.module('starter.controllers.CashierController', [])
                 items.push({
                     "item_name": $rootScope.utils.formatUnikey($scope.Bill.bill_product[j].item_name) + "",
                     "quantity": $scope.Bill.bill_product[j].quantity + "",
-                    "amount": $rootScope.utils.formatUnikey($rootScope.utils.formatMoney($scope.Bill.bill_product[j].amount)) + ""
+                    "amount": $rootScope.utils.formatUnikey($rootScope.utils.formatMoney($scope.Bill.bill_product[j].amount * $scope.Bill.bill_product[j].quantity )) + ""
                 });
             }
-            console.log(JSON.stringify(items));
+
             for (var i = 0; i < $scope.Bill.bill_product.length; i++) {
+                console.log(JSON.stringify($scope.Bill.bill_product[i].amount));
                 $scope.Bill.cart.subTotal += $scope.Bill.bill_product[i].amount;
                 $scope.Bill.cart.svfee += $scope.Bill.bill_product[i].amount * 5 / 100;
             }
@@ -125,14 +143,14 @@ angular.module('starter.controllers.CashierController', [])
             WSService.start($rootScope.dockUrl);
             $timeout(function() {
                 console.log($rootScope.Connect);
-
-                if ($rootScope.Connect == 0) {
+                //check trang thai ket noi voi dock (0 - mất kết nối , 1- Có kết nối)
+                if ($rootScope.Connect == 1) {
                     console.log('ket noi thanh cong thuc hien in tu dong')
                     console.log(JSON.stringify(UserService.getUser()));
                     var jsonObj = WSService.getHeader(104);
                     //Duong truyen cung uid thiet bi can setup lai sau
                     jsonObj.uid = "0fe6:811e";
-                    // jsonObj.uid = "0483:5740";
+                    // jsonObj.uid = "0416:5011";
                     jsonObj.print_tpl = 13;
                     jsonObj.paper_type = 0;
 
@@ -162,53 +180,69 @@ angular.module('starter.controllers.CashierController', [])
                     console.log(jsonObj.print_data);
                     $timeout(function() {
                         WSService.send(jsonObj);
+                        for (var i = 0; i < data.result.length; i++) {
+                            // console.log(data.result[i][0][0].purchasedprodid)
+                            APIService.api_update_PrintStatus({ purchasedprodid: data.result[i][0][0].purchasedprodid, shopid: UserService.getUser().shopid }).then(function(result) {
 
+                                getListOrderComplete();
+
+                                  APIService.api_update_updatecachebill({ data: data, shopid: UserService.getUser().shopid }).then(function(result) {
+                                    console.log(JSON.stringify('result'));
+                                    console.log(JSON.stringify(result));
+                            }, function(err) {
+
+                            });
+
+
+                            }, function(err) {
+
+                            });
+                        }
                     }, 300);
+
+
                 }
 
-                for (var i = 0; i < data.result.length; i++) {
-                    console.log(data.result[i][0][0].purchasedprodid)
-                    APIService.api_update_PrintStatus({ purchasedprodid: data.result[i][0][0].purchasedprodid, shopid: UserService.getUser().shopid }).then(function(result) {
 
-                        getListOrderComplete();
-                        WSService.close();
-                    }, function(err) {
+                $timeout(function() {
+                    WSService.close();
 
-                    });
-                }
+                }, 300);
             }, 300);
             //Kiem tra co dang ket noi voi dock hay khong
         }
 
-        function getListOrderComplete(callback) {
-            console.log(UserService.getUser().userinfo.newFunction == "true");
+        function getListOrderComplete() {
+            console.log(JSON.stringify($rootScope.response));
+            // console.log(UserService.getUser().userinfo.newFunction == "true");
             var apiData = {
                 // 3 - 8
-                cartStatus: UserService.getUser().userinfo.newFunction == "true" ? FuncProc.NewGetListOrderComplete.cartStatus : FuncProc.OldGetListOrderComplete.cartStatus,
+                cartStatus: 8,
                 // 5 -11
-                prodStatus: UserService.getUser().userinfo.newFunction == "true" ? FuncProc.NewGetListOrderComplete.prodStatus : FuncProc.OldGetListOrderComplete.prodStatus,
+                prodStatus: 11,
                 userid: UserService.getUser().userid
             };
             console.log(JSON.stringify(apiData));
             APIService.api_get_history_order(apiData).then(function(result) {
                 $scope.listOrderComplete = result.data;
-                // console.log(JSON.stringify(result.data));
-                for (var i = 0; i < $scope.listOrderComplete.length; i++) {
-                    var total = 0;
-                    for (var j = 0; j < $scope.listOrderComplete[i].products.length; j++) {
-                        total += $scope.listOrderComplete[i].products[j].price;
-                    }
-                    $scope.listOrderComplete[i].cart.total = total;
-                }
-                if (callback != null) {
-                    callback();
-                }
+                console.log(JSON.stringify(result.data));
+                // for (var i = 0; i < $scope.listOrderComplete.length; i++) {
+                //     var total = 0;
+                //     for (var j = 0; j < $scope.listOrderComplete[i].products.length; j++) {
+                //         total += $scope.listOrderComplete[i].products[j].price;
+                //     }
+                //     $scope.listOrderComplete[i].cart.total = total;
+                // }
+                // if (callback != null) {
+                //     callback();
+                // }
 
                 // console.log(JSON.stringify($scope.listOrderComplete));
                 // $scope.getOrderCompleteDetail($scope.listOrderComplete[0].cart.cartid);
             });
         }
         $scope.$on('$ionicView.enter', function() {
+            console.log('getListOrderComplete 4');
             getListOrderComplete();
             // if (ionic.Platform.isAndroid() || ionic.Platform.isIOS()) {
             //     screen.lockOrientation('portrait');
@@ -261,46 +295,46 @@ angular.module('starter.controllers.CashierController', [])
                         for (var j = 0; j < $scope.orderCompleteDetail.products.length; j++) {
                             if ($scope.orderCompleteDetail.products[j].isChecked) {
                                 $scope.currentOrderInBill.products.push($scope.orderCompleteDetail.products[j]);
-                                // console.log(JSON.stringify($scope.orderCompleteDetail.products[j]));
+                                console.log(JSON.stringify($scope.orderCompleteDetail.products[j]));
                             }
                         }
                         console.log(JSON.stringify($scope.currentOrderInBill.products));
                         for (var i = 0; i < $scope.orderCompleteDetail.products.length; i++) {
-                            if ($scope.orderCompleteDetail.products[i].isChecked && ($scope.orderCompleteDetail.products[i].prodstat != 6)) {
+                            // && ($scope.orderCompleteDetail.products[i].prodstat != 6)
+                            // if ($scope.orderCompleteDetail.products[i].isChecked) {
 
                                 if ($scope.currentOrderInBill.bill_product.length == 0) {
-                                    console.log('th 1')
                                     $scope.currentOrderInBill.bill_product.push({
                                         item_name: $scope.orderCompleteDetail.products[i].prodname,
                                         amount: $scope.orderCompleteDetail.products[i].price,
                                         quantity: 1
                                     });
                                 } else {
-                                    console.log('th 2');
-                                    var check = false;
+                                    // var check = false;
                                     for (var j = 0; j < $scope.currentOrderInBill.bill_product.length; j++) {
-                                        if ($scope.currentOrderInBill.bill_product[j].item_name == $scope.orderCompleteDetail.products[i].prodname) {
+                                        if ($scope.currentOrderInBill.bill_product[j].item_name == $scope.orderCompleteDetail.products[i].prodname && $scope.currentOrderInBill.bill_product[j].amount == $scope.orderCompleteDetail.products[i].price) {
                                             $scope.currentOrderInBill.bill_product[j].quantity += 1;
-                                            var check = true;
+                                            // var check = true;
                                         }
                                     }
-                                    if (!check) {
+                                    // if (!check) {
                                         $scope.currentOrderInBill.bill_product.push({
                                             item_name: $scope.orderCompleteDetail.products[i].prodname,
                                             amount: $scope.orderCompleteDetail.products[i].price,
                                             quantity: 1
                                         });
-                                    }
+                                    // }
                                 }
-                            }
+                            // }
                         }
-                        // console.log(JSON.stringify($scope.currentOrderInBill.bill_product));
+                        console.log(JSON.stringify($scope.currentOrderInBill.bill_product));
 
 
 
                         for (var i = 0; i < $scope.currentOrderInBill.products.length; i++) {
-                            if ($scope.currentOrderInBill.products[i].isChecked) {
-                                $scope.currentOrderInBill.cart.subTotal += $scope.currentOrderInBill.products[i].price;
+                            // if ($scope.currentOrderInBill.products[i].isChecked) {
+                            $scope.currentOrderInBill.cart.subTotal += $scope.currentOrderInBill.products[i].price;
+                            if ($scope.currentOrderInBill.products[i].prodstat != 6) {
                                 $scope.currentOrderInBill.cart.svfee += $scope.currentOrderInBill.products[i].svfee;
                             }
 
@@ -323,7 +357,7 @@ angular.module('starter.controllers.CashierController', [])
                             var jsonObj = WSService.getHeader(104);
                             //Duong truyen cung uid thiet bi can setup lai sau
                             jsonObj.uid = "0fe6:811e";
-                            // jsonObj.uid = "0483:5740";
+                            // jsonObj.uid = "0416:5011";
                             jsonObj.print_tpl = 13;
                             jsonObj.paper_type = 0;
 
@@ -333,11 +367,9 @@ angular.module('starter.controllers.CashierController', [])
                                 items.push({
                                     "item_name": $rootScope.utils.formatUnikey($scope.currentOrderInBill.bill_product[j].item_name) + "",
                                     "quantity": $scope.currentOrderInBill.bill_product[j].quantity + "",
-                                    "amount": $rootScope.utils.formatUnikey($rootScope.utils.formatMoney($scope.currentOrderInBill.bill_product[j].amount)) + ""
+                                    "amount": $rootScope.utils.formatUnikey($rootScope.utils.formatMoney($scope.currentOrderInBill.bill_product[j].amount * $scope.currentOrderInBill.bill_product[j].quantity)) + ""
                                 });
                             }
-
-                            console.log(cart.cart);
                             console.log(JSON.stringify($scope.currentOrderInBill.cart.subTotal));
                             var time = $rootScope.utils.formatDateView(cart.cart.ordertime);
 
@@ -360,7 +392,7 @@ angular.module('starter.controllers.CashierController', [])
                                 "service_charge_value": moneyfee + "",
                                 "total": moneyTotal + "",
                                 "footer1": "Thank you for coming !",
-                                "footer2": "( BẢN IN Lại )",
+                                "footer2": "( BẢN IN LẠI  )",
                                 "item": items
                             };
 
@@ -398,17 +430,18 @@ angular.module('starter.controllers.CashierController', [])
                                     }
                                     console.log(JSON.stringify(apiData));
                                     APIService.api_update_product(apiData).then(function(result) {
-                                        // console.log(JSON.stringify(result));
+                                        console.log(JSON.stringify(result));
+                                        getListOrderComplete();
                                     }, function(err) {
                                         // body...
+                                        console.log(JSON.stringify(err));
                                     });
                                 }
                             }
                             viewBillPopup.close();
                             $scope.isShowOrderDetail = false;
-                            getListOrderComplete(function() {
-                                $scope.getOrderCompleteDetail(cartid);
-                            });
+                            console.log('getListOrderComplete 5');
+                            getListOrderComplete();
 
                         }
                     }
@@ -442,10 +475,12 @@ angular.module('starter.controllers.CashierController', [])
                                 console.log(JSON.stringify(apicart));
                                 APIService.api_update_cart(apicart).then(function(result) {
                                     console.log(JSON.stringify(result));
+                                    console.log('getListOrderComplete 6');
                                     getListOrderComplete();
                                     PopupService.closePopup();
                                 }, function(err) {
                                     // body...
+                                    console.log(JSON.stringify(err));
                                 });
                                 $scope.isShowOrderDetail = false;
                             }

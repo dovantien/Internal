@@ -1,0 +1,26 @@
+<ion-view view-title="Cấu hình máy In">
+    <ion-content style='background: aliceblue;'>
+        <ion-list>
+            <ion-item ui-sref-active="left_menu_active_item" class="left_setting_item " menu-close>
+                <div class="left_red_menu "></div>
+                <div class="div_icon_setting"><i style="color: black">Chọn Máy In</i></div>
+                <select  class="Printing" ng-model="deviceList.deviceSelected" ng-options="device.id for device in deviceList track by device.uid"></select>
+                <ion-spinner ng-hide="status" class="find_Print" ng-init="find_print()"></ion-spinner>
+                <div ng-show="status" class="ion-ios-checkmark-outline find_Print" style="color: blue"></div>
+                <!-- ion-ios-checkmark-outline -->
+                <!-- <div class="icon find_Print" ng-click="find_print()"><ion-spinner>load</ion-spinner>load</div> -->
+            </ion-item>
+            <ion-item ui-sref-active="left_menu_active_item" class="left_setting_item " menu-close>
+                <div class="left_red_menu "></div>
+                <div class="div_icon_setting"><i style="color: black">Chọn Khổ Giấy</i></div>
+                <select class="Printing" ng-model="paperList.selectedOption" ng-options="option.name for option in paperList.paperTypeOption track by option.type"></select>
+            </ion-item>
+            <ion-item ui-sref-active="left_menu_active_item" class="left_setting_item " menu-close 
+            ng-click="ConfigPrint(paperList.selectedOption,deviceList.deviceSelected)">
+                <div class="left_red_menu "></div>
+                <div class="div_icon_setting"><i style="text-align: center;"></i></div>
+                <div class="changepass_submit">Cấu Hình</div>
+            </ion-item>
+        </ion-list>
+    </ion-content>
+</ion-view>
