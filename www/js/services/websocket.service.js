@@ -222,7 +222,7 @@ angular.module('starter.services.WSService', [])
                     
                     var apiData = {
                         shopid: UserService.getUser().shopid,
-                        status: JSON.stringify(message),
+                        status: message,
                         logs: 'send'
                     };
                     console.log(JSON.stringify(apiData));
@@ -275,12 +275,9 @@ angular.module('starter.services.WSService', [])
                 isConnecting = false;
 
                 ws.onmessage = function(message) {
-                    console.log(message);
-                    return JSON.stringify(message);
-                }
+                    console.log(message);                }
                 ws.onerror = function(message) {
                     console.log(message);
-                    return JSON.stringify(message);
                 }
 
             }

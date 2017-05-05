@@ -2,7 +2,10 @@
   <img src="img/BG_login.jpg" style="width: 100%;height: 100%">
   <ion-content has-bouncing="false" delegate-handle="history_list" overflow-scroll = "true">
     <ion-list has-bouncing="false">
-      <ion-item collection-repeat="item in listOrderComplete" class="item odh_item odh_item_status_{{item.cartstatus}}" ng-click="getOrderCompleteDetail(item.cart.cartid)">
+    <label style="color: saddlebrown;font-weight: bold; margin: 10px 0 0 10px">Tìm Kiếm theo bàn :
+                <input type="text" style="margin: 0 0 0 10px;" ng-model="searchtable.cart.shoptablename">
+            </label>
+      <ion-item collection-repeat="item in listOrderComplete  | filter:searchtable" class="item odh_item odh_item_status_{{item.cartstatus}}" ng-click="getOrderCompleteDetail(item.cart.cartid)">
         <div class="orderdetail_stt" ng-style="item.cart.cartstat == 5 ? {background:'green'} : {}">{{$index + 1}}</div>
         <div class="row">
           <div class="col col-50 odh_cartnumb">#{{item.cart.cartnumb}}</div>

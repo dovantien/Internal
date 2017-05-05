@@ -13,7 +13,7 @@
       <div class="popExchange_gift2">
         <span class="popExchange_coin" style="font-size: 13px">{{item.item_name}}</span>
         <span class="popExchange_quantity">| {{item.quantity}} |</span>
-        <span class="popExchange_monney">{{ utils.formatMoney(item.amount * 1); }}</span>
+        <span class="popExchange_monney">{{ utils.formatMoney(item.amount * item.quantity); }}</span>
       </div>
     </div>
   </div>

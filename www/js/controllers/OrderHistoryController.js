@@ -29,13 +29,16 @@ angular.module('starter.controllers.OrderHistoryController', [])
             }
             console.log(JSON.stringify(apiData));
             APIService.api_get_history_order(apiData).then(function(result) {
-                // console.log(JSON.stringify(result.data));
+                $ionicLoading.hide();
+                console.log(JSON.stringify(result.data));
                 UserService.setHistoryOrder(result.data);
                 $scope.listHistoryOrder = UserService.getHistoryOrder();
                 $ionicScrollDelegate.$getByHandle('history_list').scrollTop(false);
+
+            }, function(err) {
                 $ionicLoading.hide();
             });
-        }
+        };
 
         function forloop(length, fn) {
             var index = 0;
@@ -152,17 +155,14 @@ angular.module('starter.controllers.OrderHistoryController', [])
                     jsonObj.print_data = JSON.stringify(dataJson);
                     console.log('thực hiện in ! ');
                     console.log(jsonObj.print_data);
-                    $timeout(function() {
                         WSService.send(jsonObj);
-
-                    }, 300);
                 }
 
                 for (var i = 0; i < data.result.length; i++) {
                     console.log(data.result[i][0][0].purchasedprodid)
                     APIService.api_update_PrintStatus({ purchasedprodid: data.result[i][0][0].purchasedprodid, shopid: UserService.getUser().shopid }).then(function(result) {
-
-                        // getListOrderComplete();
+                        console.log(JSON.stringify(result));
+                        // 
 
                     }, function(err) {
 
@@ -170,6 +170,7 @@ angular.module('starter.controllers.OrderHistoryController', [])
                 }
 
             }, 300);
+            getListOrderComplete();
             //Kiem tra co dang ket noi voi dock hay khong
         }
         //end function print
@@ -193,6 +194,7 @@ angular.module('starter.controllers.OrderHistoryController', [])
             });
         }
         $scope.$on('$ionicView.enter', function() {
+            console.log('$ionicView.enter');
             getTables();
             getListHistory(0);
             $scope.isMore = true; //more history
@@ -221,30 +223,7 @@ angular.module('starter.controllers.OrderHistoryController', [])
         //             PopupService.showPopup(configPopup);
         //         }
         //click trả lại sản phẩm
-        $scope.clickRefunProd = function(product, indexProdCancel) {
-            console.log(JSON.stringify(product));
-            var configPopup = {
-                type: 3,
-                cancelOrderDesc: null,
-                func: function() {
-                    PopupService.closePopup();
-                    $scope.isEditted = true;
-                    $scope.edittingOrder.productsEdit.splice(indexProdCancel, 1);
-                    var apiData = {
-                        pPurchasedprodid: product.purchasedprodid,
-                        pNote: configPopup.cancelOrderDesc,
-                        pManagerid: UserService.getUser().userid
-                    };
-                    console.log(JSON.stringify(apiData));
-                    APIService.api_refund_product(apiData).then(function(success) {
-                        console.log(JSON.stringify(success));
-                    }, function(err) {
-                        // body...
-                    });
-                }
-            }
-            PopupService.showPopup(configPopup);
-        }
+
         $scope.moreHistory = function(value) {
             $scope.isMore = !$scope.isMore;
             getListHistory(value);
@@ -362,6 +341,31 @@ angular.module('starter.controllers.OrderHistoryController', [])
                             $scope.isEditted = true;
                             productsCancel.push(prodcancel);
                             $scope.edittingOrder.productsEdit.splice(indexProdCancel, 1);
+                        }
+                    }
+                    PopupService.showPopup(configPopup);
+                }
+                $scope.clickRefunProd = function(product, indexProdCancel) {
+                    console.log(JSON.stringify(product));
+                    var configPopup = {
+                        type: 3,
+                        cancelOrderDesc: null,
+                        func: function() {
+                            PopupService.closePopup();
+                            $scope.isEditted = true;
+                            productsCancel.push(product);
+                            $scope.edittingOrder.productsEdit.splice(indexProdCancel, 1);
+                            var apiData = {
+                                pPurchasedprodid: product.purchasedprodid,
+                                pNote: configPopup.cancelOrderDesc,
+                                pManagerid: UserService.getUser().userid
+                            };
+                            console.log(JSON.stringify(apiData));
+                            APIService.api_refund_product(apiData).then(function(success) {
+                                console.log(JSON.stringify(success));
+                            }, function(err) {
+                                // body...
+                            });
                         }
                     }
                     PopupService.showPopup(configPopup);
