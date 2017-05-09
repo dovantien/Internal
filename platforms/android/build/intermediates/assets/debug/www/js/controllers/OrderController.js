@@ -31,7 +31,8 @@ angular.module('starter.controllers.OrderController', [])
             $cordovaNativeAudio.preloadSimple('noti', 'sounds/noti.mp3');
         }
 
-        var socket = io('http://mycafe.co:3011');
+        var socket = io('http://it.mycafe.co:3011');
+            // var socket = io('http://mycafe.co:3011');
         socket.on('connected', function() {
             console.log('connected')
             $ionicLoading.hide();
@@ -82,6 +83,8 @@ angular.module('starter.controllers.OrderController', [])
 
         
         //end
+
+       
         var getProducts = function(verImg) {
             // console.log(JSON.stringify(UserService.getCacheImage()))
             // UserService.setCacheImage([]);

@@ -1,5 +1,5 @@
 <ion-view view-title="Order History">
-    <img src="img/BG_login.jpg" style="width: 100%;height: 100%">
+    <img src="img/BG_login.jpg" style="width: 100%;height: 100%" ng-click="reload()">
     <ion-content has-bouncing="false" delegate-handle="history_list" overflow-scroll="true">
         <button ng-if="!isMore" class="button button-block button-positive" ng-click="moreHistory(0)" style="background: red">
             Đơn Hiện tại

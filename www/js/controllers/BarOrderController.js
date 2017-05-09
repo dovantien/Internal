@@ -3,7 +3,9 @@ angular.module('starter.controllers.BarOrderController', [])
             console.log('bar order');
             $scope.utils = UtilsService;
             $scope.sound = ngAudio.load("sounds/noti.mp3");
-            var socket = io('http://mycafe.co:3011');
+            
+            var socket = io('http://it.mycafe.co:3011');
+            // var socket = io('http://mycafe.co:3011');
             socket.on('connected', function() {
                 console.log('connected')
                 $ionicLoading.hide();

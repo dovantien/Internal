@@ -5,7 +5,8 @@ angular.module('starter.services.APIService', [])
       user.sessionkey = newsession;
       UserService.setUser(user);
     }
-    var proxyURL = 'http://mycafe.co:3011'
+     var proxyURL = 'http://it.mycafe.co:3011'       
+    // var proxyURL = 'http://mycafe.co:3011'
     var api_get_authkey = function(apiData) {
       return $http.post(proxyURL + '/getauthkey', apiData);
     };

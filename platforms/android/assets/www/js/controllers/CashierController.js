@@ -7,7 +7,8 @@ angular.module('starter.controllers.CashierController', [])
         var connectedSocket = 0;
         // $rootScope.isConnected = false;
         $rootScope.dockUrl = "ws://192.168.35.1:9876/ws/";
-        var socket = io('http://mycafe.co:3011');
+        var socket = io('http://it.mycafe.co:3011');
+            // var socket = io('http://mycafe.co:3011');
         socket.on('connected', function() {
             console.log('connected')
             $ionicLoading.hide();
@@ -34,9 +35,10 @@ angular.module('starter.controllers.CashierController', [])
             console.log('reload list order');
             console.log(JSON.stringify(data));
             // for(var i= 0 ; i< data.result.length; i++){
-
+                console.log(UserService.getUser().roleid ==4)
             // }
-            if (data.result) {
+            if (data.result && UserService.getUser().roleid == 4 ) {
+                console.log('thu ngân in tự động');
                 AutoPrint(data);
             } else {
                 console.log(JSON.stringify(data));
@@ -185,22 +187,25 @@ angular.module('starter.controllers.CashierController', [])
 
                             // WSService.close();
 
-                            APIService.api_update_updatecachebill({ data: data, shopid: UserService.getUser().shopid }).then(function(result) {
-                                console.log(JSON.stringify('result'));
-                                console.log(JSON.stringify(result));
-                            }, function(err) {
+                            // APIService.api_update_updatecachebill({ data: data, shopid: UserService.getUser().shopid }).then(function(result) {
+                            //     console.log(JSON.stringify('result'));
+                            //     console.log(JSON.stringify(result));
+                            // }, function(err) {
 
-                            });
+                            // });
 
 
                         }, function(err) {
 
                         });
                     }
-                    // $timeout(function() {
+                    $timeout(function() {
                         WSService.send(jsonObj);
-                        getListOrderComplete();
-                    // }, 300);
+                        // getListOrderComplete(function() {
+                        //         $scope.getOrderCompleteDetail(cartid);
+                        //     });
+
+                    }, 500);
 
 
                 }
@@ -209,7 +214,7 @@ angular.module('starter.controllers.CashierController', [])
             //Kiem tra co dang ket noi voi dock hay khong
         }
 
-        function getListOrderComplete() {
+        function getListOrderComplete(callback) {
             console.log(JSON.stringify($rootScope.response));
             // console.log(UserService.getUser().userinfo.newFunction == "true");
             var apiData = {
@@ -230,25 +235,24 @@ angular.module('starter.controllers.CashierController', [])
                 //     }
                 //     $scope.listOrderComplete[i].cart.total = total;
                 // }
-                // if (callback != null) {
-                //     callback();
-                // }
-
-                // console.log(JSON.stringify($scope.listOrderComplete));
-                // $scope.getOrderCompleteDetail($scope.listOrderComplete[0].cart.cartid);
+                if (callback != null) {
+                    callback();
+                }
             });
+
         }
+
         $scope.$on('$ionicView.enter', function() {
             console.log('getListOrderComplete 4');
 
-            $ionicHistory.clearCache().then(function() { getListOrderComplete(); });
+            // $ionicHistory.clearCache().then(function() { getListOrderComplete(); });
 
             // if (ionic.Platform.isAndroid() || ionic.Platform.isIOS()) {
             //     screen.lockOrientation('portrait');
             // }
         }); // end on enter
         $scope.getOrderCompleteDetail = function(cartid) {
-            // WSService.start($rootScope.dockUrl);
+            WSService.start($rootScope.dockUrl);
 
             for (var i = 0; i < $scope.listOrderComplete.length; i++) {
                 if ($scope.listOrderComplete[i].cart.cartid == cartid) {
@@ -272,14 +276,14 @@ angular.module('starter.controllers.CashierController', [])
                     $scope.closePopup = function() {
                         $scope.isShowOrderDetail = false;
 
-
+                        getListOrderComplete();
                         // WSService.close();
 
                     }
                     $scope.viewBill = function() {
                         // console.log($rootScope.utils.activeFunFromUser(UserService.getUser().roleid,6));
                         //Mở kết nối DockSever
-                        WSService.start($rootScope.dockUrl);
+                        // WSService.start($rootScope.dockUrl);
 
 
 
@@ -348,7 +352,7 @@ angular.module('starter.controllers.CashierController', [])
                         ClosePopupService.register(viewBillPopup);
                         $scope.closeDetailPopupClick = function() {
                             viewBillPopup.close();
-                            // WSService.close();
+                            WSService.close();
                         }
                         $scope.bill = function() {
                             //Duong test print
@@ -459,7 +463,7 @@ angular.module('starter.controllers.CashierController', [])
                                             console.log(JSON.stringify(apiData));
                                             APIService.api_update_product(apiData).then(function(result) {
                                                 console.log(JSON.stringify(result));
-                                                // getListOrderComplete();
+                                                getListOrderComplete();
                                                 // WSService.close();
                                             }, function(err) {
                                                 // body...
@@ -470,6 +474,7 @@ angular.module('starter.controllers.CashierController', [])
                                     viewBillPopup.close();
                                     $scope.isShowOrderDetail = false;
                                     // console.log('getListOrderComplete 5');
+                                    // getListOrderComplete();
                                     getListOrderComplete();
                                 }
                             }
@@ -510,16 +515,14 @@ angular.module('starter.controllers.CashierController', [])
                                     PopupService.closePopup();
                                 }, function(err) {
                                     // body...
-                                    PopupService.closePopup();
-                                    console.log(JSON.stringify(err));
                                 });
+                                PopupService.closePopup();
                                 $scope.isShowOrderDetail = false;
                             }
                         });
                     }
                 }
             }
-            //$ionicScrollDelegate.$getByHandle('bar_left_content').scrollTop(false);
         }
 
     }); // End controller AuthController

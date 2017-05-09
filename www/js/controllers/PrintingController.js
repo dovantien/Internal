@@ -14,7 +14,8 @@ angular.module('starter.controllers.PrintingController', [])
         $scope.paperTypeSelected = {};
         $rootScope.paperType = {};
         $rootScope.dockUrl = "ws://192.168.35.1:9876/ws/";
-        var socket = io('http://mycafe.co:3011');
+        var socket = io('http://it.mycafe.co:3011');
+            // var socket = io('http://mycafe.co:3011');
         socket.on('connected', function() {
             console.log('connected')
             $ionicLoading.hide();
@@ -79,21 +80,23 @@ angular.module('starter.controllers.PrintingController', [])
 
         $scope.sendMsgGetDeviceList = function() {
             $rootScope.listDevices = [];
-            var jsonObj = WSService.getHeader(1);
+          var jsonObj = WSService.getHeader(1);
             jsonObj.type = 1;
+
+            // jsonObj.data = jsonData;
             WSService.send(jsonObj);
             var listDevices = {};
             $timeout(function() {
                 listDevices = JSON.parse($rootScope.response);
-                // list= $rootScope.response;
-                console.log(listDevices.data);
+                list= $rootScope.response;
+                console.log(JSON.stringify(listDevices.data.devices));
                 for (var i = 0; i < listDevices.data.devices.length; i++) {
                     if (listDevices.data.devices[i].id != '1d6b:0002' && listDevices.data.devices[i].id != '0424:2514') {
                         $rootScope.listDevices.push(listDevices.data.devices[i]);
                     }
                 };
                 $rootScope.deviceSelected = $rootScope.listDevices[0];
-                // console.log(JSON.stringify($rootScope.listDevices))
+                console.log(JSON.stringify($rootScope.listDevices))
             }, 100);
         };
         $scope.$on('$ionicView.enter', function() {

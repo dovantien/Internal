@@ -83,8 +83,8 @@ angular.module('starter.services.WSService', [])
                 ws = new WebSocket(wsServerUrl);
                 //receive data from server
                 ws.onmessage = function(message) {
-                    console.log("onmessage");
-                    console.log(message);
+                    // console.log("onmessage");
+                    // console.log(message);
                     var cbFunc;
                     var jsonObj = JSON.parse(message.data);
                     //jsonObj.data = JSON.parse(jsonObj.data);
@@ -108,8 +108,8 @@ angular.module('starter.services.WSService', [])
 
                         cbFunc(jsonObj);
                     } else {
-                        console.log("received not process..................................");
-                        console.log(jsonObj);
+                        // console.log("received not process..................................");
+                        // console.log(jsonObj);
                     }
 
                     var apiData = {
@@ -117,12 +117,12 @@ angular.module('starter.services.WSService', [])
                         status: JSON.stringify(message),
                         logs: JSON.stringify(jsonObj)
                     };
-                    console.log(JSON.stringify(apiData));
-                    APIService.api_writeLogFile(apiData).then(function(result) {
-                        console.log(JSON.stringify(result));
-                    }, function(err) {
-                        // body...
-                    });
+                    // console.log(JSON.stringify(apiData));
+                    // APIService.api_writeLogFile(apiData).then(function(result) {
+                    //     console.log(JSON.stringify(result));
+                    // }, function(err) {
+                    //     // body...
+                    // });
 
 
                 };
@@ -141,12 +141,12 @@ angular.module('starter.services.WSService', [])
                         status: JSON.stringify(event),
                         logs: 'onopen connect success'
                     };
-                    console.log(JSON.stringify(apiData));
-                    APIService.api_writeLogFile(apiData).then(function(result) {
-                        console.log(JSON.stringify(result));
-                    }, function(err) {
-                        // body...
-                    });
+                    // console.log(JSON.stringify(apiData));
+                    // APIService.api_writeLogFile(apiData).then(function(result) {
+                    //     console.log(JSON.stringify(result));
+                    // }, function(err) {
+                    //     // body...
+                    // });
                 };
 
                 ws.onclose = function(event) {
@@ -160,12 +160,12 @@ angular.module('starter.services.WSService', [])
                         status: JSON.stringify(event) ,
                         logs: 'connection closed'
                     };
-                    console.log(JSON.stringify(apiData));
-                    APIService.api_writeLogFile(apiData).then(function(result) {
-                        console.log(JSON.stringify(result));
-                    }, function(err) {
-                        // body...
-                    });
+                    // console.log(JSON.stringify(apiData));
+                    // APIService.api_writeLogFile(apiData).then(function(result) {
+                    //     console.log(JSON.stringify(result));
+                    // }, function(err) {
+                    //     // body...
+                    // });
                 };
 
                 ws.onerror = function(event) {
@@ -179,12 +179,12 @@ angular.module('starter.services.WSService', [])
                         status: JSON.stringify(event),
                         logs: 'connection Error'
                     };
-                    console.log(JSON.stringify(apiData));
-                    APIService.api_writeLogFile(apiData).then(function(result) {
-                        console.log(JSON.stringify(result));
-                    }, function(err) {
-                        // body...
-                    });
+                    // console.log(JSON.stringify(apiData));
+                    // APIService.api_writeLogFile(apiData).then(function(result) {
+                    //     console.log(JSON.stringify(result));
+                    // }, function(err) {
+                    //     // body...
+                    // });
                 };
                 // console.log(ws.readyState);
                 console.log("startNewWebsocket end");
@@ -206,6 +206,8 @@ angular.module('starter.services.WSService', [])
             function send(message) {
                 if (angular.isString(message)) {
                     
+                    
+                    ws.send(message);
                     var apiData = {
                         shopid: UserService.getUser().shopid,
                         status: JSON.stringify(message),
@@ -217,7 +219,6 @@ angular.module('starter.services.WSService', [])
                     }, function(err) {
                         // body...
                     });
-                    ws.send(message);
                 } else if (angular.isObject(message)) {
                     
                     var apiData = {
@@ -243,12 +244,12 @@ angular.module('starter.services.WSService', [])
                         status: JSON.stringify(message),
                         logs: 'onmessage'
                     };
-                    console.log(JSON.stringify(apiData));
-                    APIService.api_writeLogFile(apiData).then(function(result) {
-                        console.log(JSON.stringify(result));
-                    }, function(err) {
-                        // body...
-                    });
+                    // console.log(JSON.stringify(apiData));
+                    // APIService.api_writeLogFile(apiData).then(function(result) {
+                    //     console.log(JSON.stringify(result));
+                    // }, function(err) {
+                    //     // body...
+                    // });
                 }
                 ws.onerror = function(message) {
                     console.log(message)
@@ -259,12 +260,12 @@ angular.module('starter.services.WSService', [])
                         status: JSON.stringify(message),
                         logs: 'onerror'
                     };
-                    console.log(JSON.stringify(apiData));
-                    APIService.api_writeLogFile(apiData).then(function(result) {
-                        console.log(JSON.stringify(result));
-                    }, function(err) {
-                        // body...
-                    });
+                    // console.log(JSON.stringify(apiData));
+                    // APIService.api_writeLogFile(apiData).then(function(result) {
+                    //     console.log(JSON.stringify(result));
+                    // }, function(err) {
+                    //     // body...
+                    // });
                 }
 
             }
@@ -315,6 +316,7 @@ angular.module('starter.services.WSService', [])
             }
 
             function start(url) {
+                genSessionID();
                 wsServerUrl = url + "?client_id=" + sessionId;
                 startNewWebsocket();
                 // console.log($rootScope.isConnected);				

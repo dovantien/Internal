@@ -1,4 +1,4 @@
-<ion-view view-title="Order" align-title="right">
+<ion-view view-title="Order" align-title="right" ng-click="reload()">
     <div class="order_div_detail">
         <ion-content class="order_log_editting" delegate-handle="mainScroll" ng-click="clickOrderDetail()">
             <div ng-repeat="x in edittingOrder.listProd track by $index" style="border-bottom: solid 1px #989494;">

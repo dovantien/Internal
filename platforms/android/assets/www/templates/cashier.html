@@ -1,5 +1,5 @@
 <ion-view view-title="Danh sách sản phẩm order" align-title="right">
-    <img src="img/BG_login.jpg" style="width: 100%;height: 100%">
+    <img src="img/BG_login.jpg" style="width: 100%;height: 100%" ng-click="reload()">
     <ion-content has-bouncing="false" delegate-handle="history_list" overflow-scroll="true">
         <ion-list has-bouncing="false">
             <ion-item collection-repeat="item in listOrderComplete" class="item odh_item odh_item_status_{{item.cartstatus}}" ng-click="getOrderCompleteDetail(item.cart.cartid)">

@@ -50,12 +50,13 @@ var MSG_CAN_ADD_MORE =
     'Sửa đơn hàng có lỗi. Số lượng của một sản phẩm không được lớn hơn so với đơn hàng cũ';
 var MSG_CONFIRM_CANCEL_ORDER = 'Bạn có chắc chắn muốn huỷ đơn hàng không?';
 var MSG_RE_LOGIN = 'Phiên giao dịch của bạn đã kết thúc. Để nghị đăng nhập lại đế tiếp tục.';
-var NUMBER_VERSION = 12;
+var NUMBER_VERSION = 17;
 var CLIENT_IOS_VERSION = 'Ios_2.0.1';
 var CLIENT_ANDROID_VERSION = 'Android_2.0.1';
 var CHANNEL = 'production';
-var DEPLOY_VERSION = 12;
+var DEPLOY_VERSION = 17;
 // var CHANNEL = 'dev';
+//ban cũ 'production' = 15;
 // var DEPLOY_VERSION = 12;
 
 //Phân quyền
