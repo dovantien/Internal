@@ -3,8 +3,8 @@ angular.module('starter.controllers.PaidController', [])
     $cordovaPrinter, ClosePopupService, PopupService) {
     console.log('PaidController');
     $scope.sound = ngAudio.load("sounds/noti.mp3");
-    var socket = io('http://it.mycafe.co:3011');
-            // var socket = io('http://mycafe.co:3011');
+    // var socket = io('http://it.mycafe.co:3011');
+            var socket = io('http://mycafe.co:3011');
     socket.on('connected', function() {
       console.log('connected')
       socket.emit('register', {

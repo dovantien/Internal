@@ -5,15 +5,17 @@
                 <div class="left_red_menu "></div>
                 <div class="div_icon_setting"><i style="color: black">Chọn Máy In</i></div>
                 <select  class="Printing" style="height: 50%;font-size: x-small;" ng-model="deviceSelected" ng-options="item as item.id for item in listDevices track by item.uid"></select>
-                <ion-spinner ng-hide="status" class="find_Print" ng-init="find_print()" ></ion-spinner>
+                <ion-spinner ng-hide="status" class="find_Print" ></ion-spinner>
+                <div class="find_Print" style="
+    font-size: smaller;
+    right: 7%;color: blue;" ng-click="find_print()" >Kết nối lại</div>
                 <div ng-show="status" class="ion-ios-checkmark-outline find_Print" style="color: blue"></div>
                 <!-- ion-ios-checkmark-outline -->
-                <!-- <div class="icon find_Print" ng-click="find_print()"><ion-spinner>load</ion-spinner>load</div> -->
             </ion-item>
             <ion-item ui-sref-active="left_menu_active_item" class="left_setting_item " menu-close>
                 <div class="left_red_menu "></div>
                 <div class="div_icon_setting"><i style="text-align: center;"></i></div>
-                <div class="changepass_submit" ng-click="ConfigPrint()">Cấu Hình</div>
+                <div class="changepass_submit" ng-click="startPrinter()">Cấu Hình</div>
             </ion-item>
         </ion-list>
     </ion-content>

@@ -1,65 +1,24 @@
 angular.module('starter.services.WSService', [])
     .factory('WSService',
-        function($interval, $rootScope, APIService, $log, UserService) {
+        function($interval, $rootScope, APIService, $log, UserService, $q, $timeout) {
+
             console.log("WSService begin");
             var ws;
+            $rootScope.dockUrl = "ws://192.168.35.1:9876/ws/";
             $rootScope.isConnected = false;
+            //0 đóng reconnect, 1 đang reconnect, 2 không thể reconnect
+            $rootScope.Reconnect= 0;
             var isConnecting = false;
             var mapCallBackFunc = {};
             var countPingConnectServer = 0;
+            $rootScope.response = {};
+            var responseDock = {};
             var sessionId = "";
             var wsServerUrl = "";
             var wsRequestId = 1;
-            var MSG_REQUEST = 0;
-            var MSG_RESPONSE = 1000;
-            var C2S = 0;
-            var S2C = 5000;
-
-
-            //c2s
-            var MSG_C2S_PING = C2S + 1;
-            var MSG_C2S_GET_DEVICES = C2S + 2;
-            var MSG_C2S_CTL_DEVICE = C2S + 3;
-            var MSG_C2S_CTL_DEVICE_BY_VID = C2S + 4;
-            var MSG_C2S_PRINT_TEMPLATE = C2S + 6;
-            var MSG_C2S_PRINT_TEMPLATE_BY_VID = C2S + 7;
-            var MSG_C2S_CHANGE_WIRELESS = C2S + 11;
-
-            //s2c
-            var MSG_S2C_PONG = S2C + 1;
-            var MSG_S2C_RESP_GET_DEVICES = S2C + 2;
-            var MSG_S2C_RESP_CTL_DEVICE = S2C + 3;
-            var MSG_S2C_RESP_PRINT_TEMPLATE = S2C + 5;
-            var MSG_S2C_RESP_CHANGE_WIRELESS = S2C + 8;
-            var MSG_S2C_DEVICE_STATUS = S2C + 9;
-            $rootScope.response = {};
-            // 0 la mat ket noi , 1 ket noi thanh cong
-            $rootScope.Connect = 0;
-
-            //request - response
-            var MSG_TYPE_PING = MSG_REQUEST + 0;
-            var MSG_TYPE_GET_DEVICE_LIST = MSG_REQUEST + 1;
-            var MSG_TYPE_CONTROL_DEVICE = MSG_REQUEST + 2;
-
-            var MSG_TYPE_PRINT_TEMPLATE = MSG_REQUEST + 101;
-            var MSG_TYPE_PRINT_TEMPLATE_BY_VID = MSG_REQUEST + 104;
-            var MSG_TYPE_CONTROL_DEVICE_BY_VID = MSG_REQUEST + 105;
-            var MSG_WIRELESS_CONFIG_CHANGE = MSG_REQUEST + 106;
-
-
-            //message notfication from server
-            var MSG_DEVICE_STATUS_CHANGE = 100000;
             var eventBroadcastList = {
                 eventConnectedCallBack: [],
                 eventDisConnectCallBack: []
-            }
-            var maxInt = Math.pow(2, 32) - 1;
-
-
-            function addNtfCallBack(msgType, func) {
-                //mapCallBackFunc[maxInt.toString() + '-' +msgType.toString()] = func;
-                var name = msgType.toString();
-                mapCallBackFunc[msgType.toString()] = func;
             }
 
             function addCallBack(msgType, func) {
@@ -87,222 +46,72 @@ angular.module('starter.services.WSService', [])
                 var tempNum = Math.floor(Math.random() * (1000 - 1 + 1) + 1);
                 sessionId = current.toString() + "-" + tempNum.toString();
             }
-            genSessionID();
-
+            // genSessionID();
 
 
             function startNewWebsocket() {
-                console.log("startNewWebsocket begin");
-                if ($rootScope.isConnected == true) {
-                    console.log("startNewWebsocket close connection");
-                    ws.close();
-                    $rootScope.isConnected = false;
-                };
+                console.log("startNewWebsocket begin :" + isConnecting);
 
-                isConnecting = true;
+                // if (isConnecting == true) {
+                //     console.log("startNewWebsocket close connection");
+                //     ws.close();
+                //     isConnecting = false;
+                // };
                 ws = new WebSocket(wsServerUrl);
-                //receive data from server
+                // isConnecting = true;
                 ws.onmessage = function(message) {
-                    // console.log("onmessage");
-                    // console.log(message);
+                    console.log("startNewWebsocket onmessage" + message);
+                    isConnecting = true;
                     var cbFunc;
                     var jsonObj = JSON.parse(message.data);
-                    //jsonObj.data = JSON.parse(jsonObj.data);
-                    // console.log("received msg");
-                    // console.log(jsonObj);
-                    var methodId = jsonObj.method_id.toString();
-                    // if (jsonObj.status == maxInt) {
-                    //   methodId = maxInt.toString() + '-' + methodId;
-                    // }
 
-                    //console.log("message message message message");
-                    //console.log(jsonObj);
-                    if (jsonObj.method_id === MSG_TYPE_PING && jsonObj.status !== maxInt) { //ping to server and received pong msg   
-                        //console.log("received pong message");       
+                    var msgType = jsonObj.msg_type.toString();
+
+                    if (msgType == MSG_S2C_PONG) { //ping to server and received pong msg   
                         countPingConnectServer = 0;
-                        //console.log(jsonObj.data);
-                    } else if (mapCallBackFunc.hasOwnProperty(methodId)) {
-                        //console.log("received msg");
-                        //console.log(jsonObj);
-                        cbFunc = mapCallBackFunc[methodId];
-
+                    } else if (mapCallBackFunc.hasOwnProperty(msgType)) {
+                        console.log("received msg");
+                        console.log(jsonObj);
+                        cbFunc = mapCallBackFunc[msgType];
                         cbFunc(jsonObj);
                     } else {
-                        // console.log("received not process..................................");
-                        // console.log(jsonObj);
+                        console.log("received not process..................................");
+                        console.log(jsonObj);
                     }
 
-                    var apiData = {
-                        shopid: UserService.getUser().shopid,
-                        status: JSON.stringify(message),
-                        logs: JSON.stringify(jsonObj)
-                    };
-                    // console.log(JSON.stringify(apiData));
-                    // APIService.api_writeLogFile(apiData).then(function(result) {
-                    //     console.log(JSON.stringify(result));
-                    // }, function(err) {
-                    //     // body...
-                    // });
-
-
                 };
-
-                ws.onopen = function(event) {
-
-                    console.log("onopen connect success", event);
+                ws.onopen = function() {
+                    console.log("onopen connect success");
                     console.log(ws);
                     $rootScope.isConnected = true;
-                    $rootScope.Connect = 1;
                     countPingConnectServer = 0;
                     broadcastEventCallback(eventBroadcastList.eventConnectedCallBack);
-                    isConnecting = false;
-                    var apiData = {
-                        shopid: UserService.getUser().shopid,
-                        status: JSON.stringify(event),
-                        logs: 'onopen connect success'
-                    };
-                    // console.log(JSON.stringify(apiData));
-                    // APIService.api_writeLogFile(apiData).then(function(result) {
-                    //     console.log(JSON.stringify(result));
-                    // }, function(err) {
-                    //     // body...
-                    // });
+                    isConnecting = true;
                 };
-
                 ws.onclose = function(event) {
                     console.log('connection closed', event);
                     $rootScope.isConnected = false;
                     broadcastEventCallback(eventBroadcastList.eventDisConnectCallBack);
                     isConnecting = false;
-                    $rootScope.Connect = 0;
-                    var apiData = {
-                        shopid: UserService.getUser().shopid,
-                        status: JSON.stringify(event),
-                        logs: 'connection closed'
-                    };
-                    // console.log(JSON.stringify(apiData));
-                    // APIService.api_writeLogFile(apiData).then(function(result) {
-                    //     console.log(JSON.stringify(result));
-                    // }, function(err) {
-                    //     // body...
-                    // });
                 };
-
                 ws.onerror = function(event) {
                     console.log('connection Error', event);
                     isConnecting = false;
-                    $rootScope.isConnected = false;
-                    $rootScope.Connect = 0;
-                    console.log('mat ket noi')
-                    var apiData = {
-                        shopid: UserService.getUser().shopid,
-                        status: JSON.stringify(event),
-                        logs: 'connection Error'
-                    };
-                    // console.log(JSON.stringify(apiData));
-                    // APIService.api_writeLogFile(apiData).then(function(result) {
-                    //     console.log(JSON.stringify(result));
-                    // }, function(err) {
-                    //     // body...
-                    // });
                 };
-                // console.log(ws.readyState);
-                console.log("startNewWebsocket end");
+                console.log("startNewWebsocket finish");
             };
-
-            //startNewWebsocket();
 
             function sendPingMsg() {
                 var jsonObj = {};
-                jsonObj.method_id = MSG_TYPE_PING;
+                jsonObj.msg_type = MSG_C2S_PING;
                 jsonObj.request_id = 0;
-                jsonObj.payload = "Ping from client";
+                jsonObj.msg = "";
+                jsonObj.data = {
+                    info: "Ping from client"
+                };
                 var message = JSON.stringify(jsonObj);
                 ws.send(message);
                 countPingConnectServer++;
-            }
-
-            //send message to server
-            function send(message) {
-                if (angular.isString(message)) {
-
-
-                    ws.send(message);
-                    var apiData = {
-                        shopid: UserService.getUser().shopid,
-                        status: JSON.stringify(message),
-                        logs: 'send'
-                    };
-                    console.log(JSON.stringify(apiData));
-                    APIService.api_writeLogFile(apiData).then(function(result) {
-                        console.log(JSON.stringify(result));
-                    }, function(err) {
-                        // body...
-                    });
-                } else if (angular.isObject(message)) {
-
-                    var apiData = {
-                        shopid: UserService.getUser().shopid,
-                        status: message,
-                        logs: 'send'
-                    };
-                    console.log(JSON.stringify(apiData));
-                    APIService.api_writeLogFile(apiData).then(function(result) {
-                        console.log(JSON.stringify(result));
-                    }, function(err) {
-                        // body...
-                    });
-                    ws.send(JSON.stringify(message));
-                }
-                console.log('message');
-                console.log(message);
-                console.log('respose');
-                ws.onmessage = function(message) {
-                    console.log(message);
-                    $rootScope.response = message.data;
-                    var apiData = {
-                        shopid: UserService.getUser().shopid,
-                        status: JSON.stringify(message),
-                        logs: 'onmessage'
-                    };
-                    // console.log(JSON.stringify(apiData));
-                    // APIService.api_writeLogFile(apiData).then(function(result) {
-                    //     console.log(JSON.stringify(result));
-                    // }, function(err) {
-                    //     // body...
-                    // });
-                }
-                ws.onerror = function(message) {
-                    console.log(message)
-                    $rootScope.Connect = 0;
-                    $rootScope.response = message.data;
-                    var apiData = {
-                        shopid: UserService.getUser().shopid,
-                        status: JSON.stringify(message),
-                        logs: 'onerror'
-                    };
-                    // console.log(JSON.stringify(apiData));
-                    // APIService.api_writeLogFile(apiData).then(function(result) {
-                    //     console.log(JSON.stringify(result));
-                    // }, function(err) {
-                    //     // body...
-                    // });
-                }
-
-            }
-
-            function close() {
-                console.log('closeWebsocket');
-                ws.close();
-                isConnecting = false;
-
-                ws.onmessage = function(message) {
-                    console.log(message);
-                }
-                ws.onerror = function(message) {
-                    console.log(message);
-                }
-
             }
 
             function sendRetry(message) {
@@ -322,17 +131,154 @@ angular.module('starter.services.WSService', [])
                     }
                 }, 500);
 
+            };
+            //function điều khiển máy in 
+            function sendEvtControl(data) {
+                console.log('sendEvtControl');
+                console.log(data);
+                // if (callback && typeOf(callback) == "function") {
+                //     callback();
+                // }
+                //B1: Thực hiện start socket
+                var defer = $q.defer();
+                connetSocket($rootScope.dockUrl).then(function(result) {
+                    console.log(result);
+                    console.log('Kết nối DOCK thành công');
+                    console.log(data);
+                    if (data) {
+                        send(data).then(function(result) {
+                            console.log(result);
+                            defer.resolve(result);
+                        }, function(err) {
+                            defer.reject(err);
+                            console.log(err);
+                        });
+                    }
+
+                }, function(err) {
+                    console.log('kết nối DOCK lỗi')
+                    console.log(err);
+                    defer.reject(err);
+                    // isConnecting = false;
+                    // var count = 15;
+                    // var timerId = $interval(function() {
+                    //     connetSocket($rootScope.dockUrl).then(function(result){
+                    //         console.log('Reconnect Dock thành công !');
+                    //         isConnecting= true;
+                    //         $rootScope.Reconnect=0;
+                    //     },function(err){
+                    //     });
+                    //     if (count <= 0) {
+                    //         $interval.cancel(timerId);
+                    //         console.log('Không thể reconnect tới dock');
+                    //         $rootScope.Reconnect=2;
+                    //         defer.reject('ErrConnect');
+                    //         return;
+                    //     }
+                    //     if (isConnecting == false) {
+                    //         console.log('kết nối lại : ' + count);
+                    //         $rootScope.Reconnect=1;
+                    //         count -= 1;
+                    //     } else {
+                    //         console.log('kết nối thành công !')
+                    //         $interval.cancel(timerId);
+                    //         count = 0;
+                    //         $rootScope.Reconnect=0;
+                    //         sendEvtControl(data);
+                    //     }
+                    // }, 2000);
+
+                });
+                return defer.promise;
+
             }
 
+            function connetSocket(url) {
+                genSessionID(); // gen mới session 
+                wsServerUrl = url + "?client_id=" + sessionId;
+                startNewWebsocket();
+                var defer = $q.defer();
+                $timeout(function() {
+                    if (isConnecting == true) {
+                        console.log('Socket connect success');
+                        defer.resolve(isConnecting);
+                    } else {
+                        defer.reject(isConnecting);
+                    }
+                }, 300);
+
+                return defer.promise;
+            };
+            //send message to server
+            function send(message) {
+                var defer = $q.defer();
+                if (angular.isString(message)) {
+                    console.log(JSON.stringify(message));
+                    ws.send(message);
+                    //ghi logs cho dock
+                    var apiData = {
+                        shopid: UserService.getUser().shopid,
+                        status: JSON.stringify(message),
+                        logs: 'send'
+                    };
+                    console.log(JSON.stringify(apiData));
+                    APIService.api_writeLogFile(apiData).then(function(result) {
+                        console.log(JSON.stringify(result));
+                    }, function(err) {
+                        // body...
+                    });
+                } else if (angular.isObject(message)) {
+                    console.log(message);
+                    ws.send(JSON.stringify(message));
+                    //ghi logs cho dock
+                    var apiData = {
+                        shopid: UserService.getUser().shopid,
+                        status: message,
+                        logs: 'send'
+                    };
+                    console.log(apiData);
+                    APIService.api_writeLogFile(apiData).then(function(result) {
+                        console.log(JSON.stringify(result));
+                    }, function(err) {
+                        // body...
+                    });
+                }
+
+                console.log(message);
+                ws.onmessage = function(message) {
+                    defer.resolve(message);
+                    console.log(message.data);
+                    $rootScope.response = message.data;
+                }
+                ws.onerror = function(message) {
+                    console.log(message.data)
+                    defer.reject(message);
+                    $rootScope.response = message.data;
+                }
+
+                return defer.promise;
 
 
-            var methods = {
-                //collection: collection        
             };
 
-            function getHeader(methodId) {
+            function close() {
+                console.log('closeWebsocket');
+                ws.close();
+                isConnecting = false;
+                ws.onmessage = function(message) {
+
+                    console.log(message);
+                }
+                ws.onerror = function(message) {
+                    console.log(message);
+                }
+            };
+
+
+
+            function getHeader(msgType) {
                 var jsonObj = {};
-                jsonObj.method_id = methodId;
+                jsonObj.msg_type = msgType;
                 jsonObj.request_id = ++wsRequestId;
                 return jsonObj;
             }
@@ -341,47 +287,38 @@ angular.module('starter.services.WSService', [])
                 genSessionID();
                 wsServerUrl = url + "?client_id=" + sessionId;
                 startNewWebsocket();
-                // console.log($rootScope.isConnected);             
 
-                // setInterval(function() {
+                // setInterval(function(){
                 if ($rootScope.isConnected) {
-                    console.log('check 1');
                     if (countPingConnectServer >= 3) {
-                        $rootScope.isConnected = false;
-                        if (isConnecting == false) {
-                            console.log("connect server after 4s");
-                            startNewWebsocket();
-                        }
-
+                        console.log("connect server after 4s");
+                        startNewWebsocket();
 
                     } else {
-                        // console.log('check 2');
-                        sendPingMsg();
+                        //sendPingMsg();
                     }
                 } else {
-                    // console.log('check 3');
                     if (isConnecting == false) {
                         startNewWebsocket();
                     }
                 }
 
-                // }, 3000);
+                // }, 10000);
             }
-            //Duong
 
-
+            var methods = {};
             methods.addCallBack = addCallBack;
             methods.send = send;
-            methods.close = close;
             methods.sendPingMsg = sendPingMsg;
             methods.getHeader = getHeader;
             methods.sendRetry = sendRetry;
             methods.start = start;
+            methods.close = close;
+            methods.connetSocket = connetSocket;
+            methods.sendEvtControl = sendEvtControl;
 
             methods.addEventConnectCallBack = addEventConnectCallBack;
             methods.addEventDisConnectCallBack = addEventDisConnectCallBack;
-            methods.addNtfCallBack = addNtfCallBack;
 
             return methods;
-        } // end
-    )
+        })

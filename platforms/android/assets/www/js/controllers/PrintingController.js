@@ -1,6 +1,6 @@
 angular.module('starter.controllers.PrintingController', [])
     .controller('PrintingController', function($scope, $timeout, $rootScope, APIService, $http, $q, UserService, $ionicPopup, $ionicScrollDelegate, ngAudio, $ionicModal,
-        $cordovaPrinter, ClosePopupService, PopupService, WSService, $ionicLoading, $ionicHistory) {
+        $cordovaPrinter, ClosePopupService, PopupService, WSService, $ionicLoading, $ionicHistory, WSService) {
 
         console.log('PrintingController');
         var WSService = WSService;
@@ -14,8 +14,8 @@ angular.module('starter.controllers.PrintingController', [])
         $scope.paperTypeSelected = {};
         $rootScope.paperType = {};
         $rootScope.dockUrl = "ws://192.168.35.1:9876/ws/";
-        var socket = io('http://it.mycafe.co:3011');
-            // var socket = io('http://mycafe.co:3011');
+        // var socket = io('http://it.mycafe.co:3011');
+        var socket = io('http://mycafe.co:3011');
         socket.on('connected', function() {
             console.log('connected')
             $ionicLoading.hide();
@@ -62,99 +62,109 @@ angular.module('starter.controllers.PrintingController', [])
         };
 
 
-
-        function find_print() {
+        $scope.find_print = function() {
+            console.log('find_print');
             $scope.connectDockSever();
-        }
+            // WSService.start($rootScope.dockUrl);
+            // var check = WSService.sendEvtControl();
+            // console.log(check)
+        };
         $scope.connectDockSever = function() {
-            WSService.start($rootScope.dockUrl);
-            $timeout(function() {
-                if ($rootScope.Connect == 1) {
-                    $scope.status = true;
-                    $scope.sendMsgGetDeviceList();
-                    // $scope.stopPrinter();
-                    console.log($rootScope.deviceList);
-                } else $scope.status = false;
-            }, 500);
-        }
+            // WSService.start($rootScope.dockUrl);
+            // $timeout(function() {
+            // if ($rootScope.isConnected) {
+            // $scope.status = true;
+            $scope.sendMsgGetDeviceList();
+            // $scope.stopPrinter();
+            // console.log($rootScope.deviceList);
+            // } else $scope.status = false;
+            // }, 500);
+        };
 
         $scope.sendMsgGetDeviceList = function() {
-            $rootScope.listDevices = [];
-            var jsonObj = WSService.getHeader(1);
-            jsonObj.type = 1;
-            WSService.send(jsonObj);
             var listDevices = {};
-            $timeout(function() {
-                listDevices = JSON.parse($rootScope.response);
-                // list= $rootScope.response;
-                console.log(listDevices.data);
-                for (var i = 0; i < listDevices.data.devices.length; i++) {
-                    if (listDevices.data.devices[i].id != '1d6b:0002' && listDevices.data.devices[i].id != '0424:2514') {
-                        $rootScope.listDevices.push(listDevices.data.devices[i]);
+            // $rootScope.listDevices = [];
+            var jsonObj = WSService.getHeader(MSG_C2S_GET_DEVICES);
+            var jsonData = {};
+            jsonObj.data = jsonData;
+            WSService.sendEvtControl(jsonObj).then(function(result) {
+                console.log(result.data);
+                $scope.status = true;
+                listDevices = JSON.parse(result.data);
+                // console.log(JSON.stringify(obj));
+                // listDevices= obj;
+                for (var i = 0; i < listDevices.data.device_list.length; i++) {
+                    if (listDevices.data.device_list[i].id != '1d6b:0002' && listDevices.data.device_list[i].id != '0424:2514') {
+                        $rootScope.listDevices.push(listDevices.data.device_list[i]);
                     }
                 };
                 $rootScope.deviceSelected = $rootScope.listDevices[0];
-                // console.log(JSON.stringify($rootScope.listDevices))
-            }, 100);
+                console.log(JSON.stringify($rootScope.listDevices))
+            }, function(err) {
+                console.log(err)
+                $scope.status = false;
+            });
+
+            // $timeout(function() {
+
+            // list = $rootScope.response;
+            // console.log(list);
+            // var listData= angular.toJson(listDevices, true); 
+            // console.log(listDevices);
+            // console.log(JSON.stringify(listDevices));
+            // for (var i = 0; i < listDevices.data.device_list.length; i++) {
+            //     if (listDevices.data.device_list[i].id != '1d6b:0002' && listDevices.data.device_list[i].id != '0424:2514') {
+            //         $rootScope.listDevices.push(listDevices.data.device_list[i]);
+            //     }
+            // };
+            // $rootScope.deviceSelected = $rootScope.listDevices[0];
+            // console.log(JSON.stringify($rootScope.listDevices))
+            // }, 100);
         };
         $scope.$on('$ionicView.enter', function() {
             console.log('PrintingController');
-            find_print();
             // if (ionic.Platform.isAndroid() || ionic.Platform.isIOS()) {
             //     screen.lockOrientation('portrait');
             // }
         }); // end on enter
+        
         $scope.startPrinter = function() {
             console.log("selectPrinter");
+
+
             console.log($rootScope.deviceSelected);
+            var jsonObj = WSService.getHeader(MSG_C2S_CTL_DEVICE);
 
+            // jsonObj.uid = $rootScope.deviceSelected.uid;
+            // jsonObj.ctl_type = 0;
+            // jsonObj.device_type = 1;
 
-            var jsonObj = WSService.getHeader(2);
-            jsonObj.uid = $rootScope.deviceSelected.uid;
-            jsonObj.type = 1;
-            jsonObj.ctl = 0;
-
-            WSService.send(jsonObj);
-
-
-        };
-        $scope.stopPrinter = function() {
-            console.log("selectPrinter");
-            console.log($rootScope.deviceSelected);
-
-            var jsonObj = WSService.getHeader(2);
-            jsonObj.uid = $rootScope.deviceSelected.uid;
-            jsonObj.type = 1;
-            jsonObj.ctl = 2;
-
-            WSService.send(jsonObj);
-        };
-        $scope.ConfigPrint = function(paperType, printOption) {
-            console.log('ConfigPrint');
-            var result = {};
             if ($rootScope.deviceSelected) {
-                $scope.startPrinter();
-                $timeout(function() {
-                    if ($rootScope.response) {
-                        result = JSON.parse($rootScope.response);
-                        console.log(JSON.stringify(result));
-                        if (result.data.errorCode != 1 && result.status == 1) {
-                            PopupService.showPopup({
-                                type: 1,
-                                message: 'Thiết lập máy in thành công',
-                                buttonName: 'OK',
-                                function: function() {
-                                    PopupService.closePopup();
-                                    console.log('Đóng popup');
-                                    // console.log(JSON.stringify($rootScope.configPopup));
-                                }
-                            });
+                jsonObj.data = {
+                    "uid": $rootScope.deviceSelected.uid,
+                    "device_type": 1,
+                    "ctl_type": 0
+                }
 
-                        }
+                WSService.sendEvtControl(jsonObj).then(function(result) {
+                    console.log(result.data);
+                    var jsObj = JSON.parse(result.data);
+                    if (jsObj.error_code == 0) {
+                        PopupService.showPopup({
+                            type: 1,
+                            message: 'Thiết lập máy in thành công',
+                            buttonName: 'OK',
+                            function: function() {
+                                PopupService.closePopup();
+                                console.log('Đóng popup');
+                                // console.log(JSON.stringify($rootScope.configPopup));
+                            }
+                        });
+
                     }
+                });
 
 
-                }, 200);
             } else {
                 PopupService.showPopup({
                     type: 1,
@@ -168,12 +178,68 @@ angular.module('starter.controllers.PrintingController', [])
                 });
             }
 
+        };
+        // $scope.stopPrinter = function() {
+        //     console.log("selectPrinter");
+        //     console.log($rootScope.deviceSelected);
+
+        //     var jsonObj = WSService.getHeader(MSG_C2S_CTL_DEVICE);
+        //     jsonObj.data = {
+        //             "uid": $rootScope.deviceSelected.uid,
+        //             "device_type": 1,
+        //             "ctl_type": 2
+        //         }
+        //         // jsonObj.uid = $rootScope.deviceSelected.uid;
+        //         // jsonObj.device_type = 1;
+        //         // jsonObj.ctl_type = 2;
+
+        //     WSService.send(jsonObj);
+        // };
+        // $scope.ConfigPrint = function(paperType, printOption) {
+        //     console.log('ConfigPrint');
+        //     var result = {};
+        //     if ($rootScope.deviceSelected) {
+        //         $scope.startPrinter();
+        //         $timeout(function() {
+        //             if ($rootScope.response) {
+        //                 result = JSON.parse($rootScope.response);
+        //                 console.log(JSON.stringify(result));
+        //                 if (result.data.errorCode != 1 && result.status == 1) {
+        //                     PopupService.showPopup({
+        //                         type: 1,
+        //                         message: 'Thiết lập máy in thành công',
+        //                         buttonName: 'OK',
+        //                         function: function() {
+        //                             PopupService.closePopup();
+        //                             console.log('Đóng popup');
+        //                             // console.log(JSON.stringify($rootScope.configPopup));
+        //                         }
+        //                     });
+
+        //                 }
+        //             }
+
+
+        //         }, 200);
+        //     } else {
+        //         PopupService.showPopup({
+        //             type: 1,
+        //             message: 'Chưa có máy in được chọn',
+        //             buttonName: 'OK',
+        //             function: function() {
+        //                 PopupService.closePopup();
+        //                 console.log('Đóng popup');
+        //                 // console.log(JSON.stringify($rootScope.configPopup));
+        //             }
+        //         });
+        //     }
 
 
 
 
-            // $scope.selectPaper();
-        }
+
+        //     // $scope.selectPaper();
+        // }
 
 
     });

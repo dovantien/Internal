@@ -3,7 +3,7 @@
     <ion-content has-bouncing="false" delegate-handle="history_list" overflow-scroll="true">
         <ion-list has-bouncing="false">
             <ion-item collection-repeat="item in listOrderComplete" class="item odh_item odh_item_status_{{item.cartstatus}}" ng-click="getOrderCompleteDetail(item.cart.cartid)">
-                <div class="orderdetail_stt" ng-style="item.cart.cartstat==3 ? {background:'green'} : {background:'-webkit-linear-gradient(#ff4700, #fb9700)'} ">{{$index + 1}}</div>
+                <div class="orderdetail_stt" ng-style="item.cart.printstat > 0 ? {background:'-webkit-linear-gradient(#ff4700, #fb9700)'} : {background:'green'} ">{{$index + 1}}</div>
                 <div class="row">
                     <div class="col col-50 odh_cartnumb">#{{item.cart.cartnumb}}</div>
                     <div class="col col-50 odh_timeorder">- {{item.products[0].prodnum}} {{item.products[0].prodname}}</div>
@@ -16,7 +16,7 @@
                     <div class="col col-50 odh_timeorder" ng-if="item.products[1]">- {{item.products[1].prodnum}} {{item.products[1].prodname}}</div>
                 </div>
                 <div class="row">
-                    <div class="col col-50 odh_status">{{(item.cart.cartstatname)}}</div>
+                    <div class="col col-50 odh_status" ng-style="item.cart.printstat > 0 ? {'color':'red', 'font-weight': 'bold'} : {color:'green'} " >{{ item.cart.printstat > 0 ? item.cart.printstat + ' - Sản Phẩm Chưa In' : 'Đã In' }}  </div>
                     <div class="col col-50 odh_timeorder" ng-if="item.products[2]">- {{item.products[2].prodnum}} {{item.products[2].prodname}}</div>
                 </div>
                 <div class="row">

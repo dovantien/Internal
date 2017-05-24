@@ -1,0 +1,8 @@
+<div has-bouncing="false" style="height:100%" scroll="false">
+  <img class="pop_1_close2" src="img/popup/btn_close.png" ng-click="closePopup()">
+  <div class="option_prodname">Mã đơn hàng</div>
+  <textarea class="popupFeedBack_desc" placeholder="Điền mã đơn hàng" style="margin-top: 15px;
+    width: 94%;
+    margin-left: 3%;" ng-model="onlineCartnumb"></textarea>
+  <div class="option_button_OK" ng-show="isonlineOder" ng-click="doAddCartOnline(onlineCartnumb)">OK</div>
+</div>

@@ -4,8 +4,8 @@ angular.module('starter.controllers.BarOrderController', [])
             $scope.utils = UtilsService;
             $scope.sound = ngAudio.load("sounds/noti.mp3");
             
-            var socket = io('http://it.mycafe.co:3011');
-            // var socket = io('http://mycafe.co:3011');
+            // var socket = io('http://it.mycafe.co:3011');
+            var socket = io('http://mycafe.co:3011');
             socket.on('connected', function() {
                 console.log('connected')
                 $ionicLoading.hide();
@@ -53,7 +53,7 @@ angular.module('starter.controllers.BarOrderController', [])
                             APIService.api_get_barorder_test({ shopid: UserService.getUser().shopid })
                                 .then(function(result) {
 
-                                    console.log(JSON.stringify(result));
+                                    // console.log(JSON.stringify(result));
                                     $scope.listBarOrder = result.data;
                                     $scope.getListOrderDetail($scope.selectedProd);
                                 }, function(err) {

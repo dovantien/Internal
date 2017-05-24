@@ -43,6 +43,43 @@ var FuncProc = {
     }
 
 };
+//định nghĩa của DOCK SERVICE
+var C2S = 0;
+var S2C = 5000;
+
+
+//c2s
+var MSG_C2S_PING                     = C2S + 1;
+var MSG_C2S_GET_DEVICES              = C2S + 2;
+var MSG_C2S_CTL_DEVICE               = C2S + 3;
+var MSG_C2S_CTL_DEVICE_BY_VID        = C2S + 4;
+var MSG_C2S_PRINT_TEMPLATE           = C2S + 6;
+var MSG_C2S_PRINT_TEMPLATE_BY_VID    = C2S + 7;
+var MSG_C2S_CHANGE_WIRELESS          = C2S + 11;
+
+//s2c
+var MSG_S2C_PONG                     = S2C + 1;
+var MSG_S2C_RESP_GET_DEVICES         = S2C + 2;
+var MSG_S2C_RESP_CTL_DEVICE          = S2C + 3;
+var MSG_S2C_RESP_PRINT_TEMPLATE      = S2C + 5;
+var MSG_S2C_RESP_CHANGE_WIRELESS     = S2C + 8;
+var MSG_S2C_DEVICE_STATUS            = S2C + 9;
+//Error code define
+var Success_Not_error = 0;
+var Unknown_error = 1;
+var Unknown_message_type =2;
+var Device_not_found =3;
+var Already_started =4;
+var Cannot_start =5;
+var Already_stopped =6;
+var Cannot_stop =7;
+    
+var initizalize =15;
+var Service_failed=16;
+var Invalid_data=17;
+var Print_device_error=18;
+
+
 var proxyURL = 'http://localhost:1337/';
 var dateTimeAPIFormatOption = 'YYYY-MM-DD HH:mm:ss';
 var dateTimeViewFormatOption = 'YYYY-MM-DD HH:mm';
@@ -50,13 +87,13 @@ var MSG_CAN_ADD_MORE =
     'Sửa đơn hàng có lỗi. Số lượng của một sản phẩm không được lớn hơn so với đơn hàng cũ';
 var MSG_CONFIRM_CANCEL_ORDER = 'Bạn có chắc chắn muốn huỷ đơn hàng không?';
 var MSG_RE_LOGIN = 'Phiên giao dịch của bạn đã kết thúc. Để nghị đăng nhập lại đế tiếp tục.';
-var NUMBER_VERSION = 16;
+var NUMBER_VERSION = 17;
 var CLIENT_IOS_VERSION = 'Ios_2.0.1';
 var CLIENT_ANDROID_VERSION = 'Android_2.0.1';
 var CHANNEL = 'production';
-var DEPLOY_VERSION = 16;
+var DEPLOY_VERSION = 18;
 // var CHANNEL = 'dev';
-//ban cũ 'production' = 14;
+//ban cũ 'production' = 17;
 // var DEPLOY_VERSION = 12;
 
 //Phân quyền

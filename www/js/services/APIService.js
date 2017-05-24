@@ -5,8 +5,8 @@ angular.module('starter.services.APIService', [])
       user.sessionkey = newsession;
       UserService.setUser(user);
     }
-     var proxyURL = 'http://it.mycafe.co:3011'       
-    // var proxyURL = 'http://mycafe.co:3011'
+     // var proxyURL = 'http://it.mycafe.co:3011'       
+    var proxyURL = 'http://mycafe.co:3011'
     var api_get_authkey = function(apiData) {
       return $http.post(proxyURL + '/getauthkey', apiData);
     };
@@ -220,6 +220,22 @@ angular.module('starter.services.APIService', [])
       });
     };
 
+    //add cart online
+    var api_addpurchased_online = function(apiData) {
+      var url = 'http://mycafe.co/services2.php/addCartInternal';
+      if (!window.cordova) {
+        url = 'http://localhost:1337/mycafe.co/services2.php/addCartInternal';
+      }
+      apiData.userid = UserService.getUser().userid;
+      apiData.shopid = UserService.getUser().shopid;
+      return $http.post(url, apiData).success(function(result) {
+        if(result.session != null){
+          updateSession(result.session);
+        }
+      });
+    }; 
+    //end cart online
+
 
     return {
       api_get_authkey: api_get_authkey,
@@ -250,6 +266,8 @@ angular.module('starter.services.APIService', [])
       api_set_AddPurchasedProductNewFunc:api_set_AddPurchasedProductNewFunc,
       api_update_PrintStatus:api_update_PrintStatus,
       api_update_updatecachebill:api_update_updatecachebill,
-      api_getcachebill:api_getcachebill
+      api_getcachebill:api_getcachebill,
+
+      api_addpurchased_online:api_addpurchased_online
     };
   });

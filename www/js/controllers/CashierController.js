@@ -1,14 +1,15 @@
 angular.module('starter.controllers.CashierController', [])
     .controller('CashierController', function($scope, $rootScope, $timeout, APIService, $http, $q, UserService, $ionicPopup, $ionicScrollDelegate, ngAudio, $ionicModal,
-        $cordovaPrinter, ClosePopupService, PopupService, WSService, $ionicLoading, $filter, $ionicHistory) {
+        $cordovaPrinter, ClosePopupService, PopupService, WSService, $ionicLoading, $filter, $ionicHistory, $interval) {
         console.log('CashierController');
         $scope.sound = ngAudio.load("sounds/noti.mp3");
         var request_id = 1;
         var connectedSocket = 0;
+        var print_stt = false;
         // $rootScope.isConnected = false;
         $rootScope.dockUrl = "ws://192.168.35.1:9876/ws/";
-        var socket = io('http://it.mycafe.co:3011');
-        // var socket = io('http://mycafe.co:3011');
+        // var socket = io('http://it.mycafe.co:3011');
+        var socket = io('http://mycafe.co:3011');
         socket.on('connected', function() {
             console.log('connected')
             $ionicLoading.hide();
@@ -111,7 +112,7 @@ angular.module('starter.controllers.CashierController', [])
                             if ($scope.Bill.bill_product[j].item_name == data.result[i][0][0].prodname) {
                                 $scope.Bill.bill_product[j].quantity += 1;
                                 $scope.Bill.cart.subTotal += $scope.Bill.bill_product[j].amount;
-                                $scope.Bill.cart.svfee += $scope.Bill.bill_product[j].amount * 5 / 100;
+                                $scope.Bill.cart.svfee += $scope.Bill.bill_product[j].amount * 10 / 100;
                                 var check = true;
                             }
                         }
@@ -139,97 +140,375 @@ angular.module('starter.controllers.CashierController', [])
             for (var i = 0; i < $scope.Bill.bill_product.length; i++) {
                 console.log(JSON.stringify($scope.Bill.bill_product[i].amount));
                 $scope.Bill.cart.subTotal += $scope.Bill.bill_product[i].amount;
-                $scope.Bill.cart.svfee += $scope.Bill.bill_product[i].amount * 5 / 100;
+                $scope.Bill.cart.svfee += $scope.Bill.bill_product[i].amount * 10 / 100;
             }
 
-            WSService.start($rootScope.dockUrl);
-            $timeout(function() {
-                console.log($rootScope.Connect);
-                //check trang thai ket noi voi dock (0 - mất kết nối , 1- Có kết nối)
-                if ($rootScope.Connect == 1) {
-                    console.log('ket noi thanh cong thuc hien in tu dong')
-                    console.log(JSON.stringify(UserService.getUser()));
-                    var jsonObj = WSService.getHeader(104);
-                    //Duong truyen cung uid thiet bi can setup lai sau
-                    jsonObj.uid = UserService.getUser().shops[0].printid;
-                    // jsonObj.uid = "0416:5011";
-                    jsonObj.print_tpl = 13;
-                    jsonObj.paper_type = 0;
+            // WSService.start($rootScope.dockUrl);
+            // $timeout(function() {
+            console.log($rootScope.isConnected);
+            //check trang thai ket noi voi dock (0 - mất kết nối , 1- Có kết nối)
+            console.log('ket noi thanh cong thuc hien in tu dong')
+            console.log(JSON.stringify(UserService.getUser()));
+            var jsonObj = WSService.getHeader(MSG_C2S_PRINT_TEMPLATE_BY_VID);
+            //Duong truyen cung uid thiet bi can setup lai sau
+            jsonObj.error_code = "";
+            // jsonObj.uid = UserService.getUser().shops[0].printid;
+            // // jsonObj.uid = "0416:5011";
+            // // jsonObj.msg = "";
+            // jsonObj.template_type = 13;
+            // jsonObj.paper_type = 0;
 
-                    var time = $rootScope.utils.formatDateView(data.result[0][0][0].ordertime);
-                    var moneyfee = $scope.Bill.cart.subTotal > 0 ? $rootScope.utils.formatUnikey($rootScope.utils.formatMoney($scope.Bill.cart.svfee)) : 0;
-                    var moneyTotal = $rootScope.utils.formatUnikey($rootScope.utils.formatMoney($scope.Bill.cart.subTotal + $scope.Bill.cart.svfee));
+            var time = $rootScope.utils.formatDateView(data.result[0][0][0].ordertime);
+            var moneyfee = $scope.Bill.cart.subTotal > 0 ? $rootScope.utils.formatUnikey($rootScope.utils.formatMoney($scope.Bill.cart.svfee)) : 0;
+            var moneyTotal = $rootScope.utils.formatUnikey($rootScope.utils.formatMoney($scope.Bill.cart.subTotal + $scope.Bill.cart.svfee));
 
-                    var dataJson = {
-                        "title": "Helio",
-                        "sub_title": "Vietnam Specialty Coffee",
-                        "address": UserService.getUser().shops[0].shopaddress,
-                        "tel": UserService.getUser().shops[0].shopphone,
-                        "datetime": time + "",
-                        "receipt_num": data.result[0][0][0].cartnumb + "",
-                        "shift": data.result[0][0][0].username + "",
-                        "table": data.result[0][0][0].shoptablename + "",
-                        "service_charge_percent": "5%",
-                        "service_charge_value": moneyfee + "",
-                        "total": moneyTotal + "",
-                        "footer1": "Thank you for coming !",
-                        "footer2": "",
-                        "item": items
-                    };
+            var dataJson = {
+                "title": "Helio",
+                "sub_title": "Vietnam Specialty Coffee",
+                "address": UserService.getUser().shops[0].shopaddress,
+                "tel": UserService.getUser().shops[0].shopphone,
+                "datetime": time + "",
+                "receipt_num": data.result[0][0][0].cartnumb + "",
+                "shift": data.result[0][0][0].username + "",
+                "table": data.result[0][0][0].shoptablename + "",
+                "service_charge_percent": "10%",
+                "service_charge_value": moneyfee + "",
+                "total": moneyTotal + "",
+                "footer1": "Thank you for coming !",
+                "footer2": "",
+                "item": items
+            };
+            jsonObj.data = {
+                "uid": UserService.getUser().shops[0].printid,
+                "template_type": 13,
+                "paper_type": 0,
+                "print_data": JSON.stringify(dataJson)
 
-                    jsonObj.print_data = JSON.stringify(dataJson);
-                    console.log('thực hiện in ! ');
-                    console.log(jsonObj.print_data);
-                    for (var i = 0; i < data.result.length; i++) {
-                        console.log(data.result[i][0][0].purchasedprodid)
-                        APIService.api_update_PrintStatus({ purchasedprodid: data.result[i][0][0].purchasedprodid, shopid: UserService.getUser().shopid }).then(function(result) {
+            }
+            jsonObj.print_data = dataJson;
+            console.log('thực hiện in ! ');
+            console.log(jsonObj);
+            //in tu dong cu~
+            // WSService.sendEvtControl(jsonObj).then(function(result) {
+            //     console.log(result);
+            //     //        for (var i = 0; i < data.result.length; i++) {
+            //     //     console.log(data.result[i][0][0].purchasedprodid)
+            //     //     APIService.api_update_PrintStatus({ purchasedprodid: data.result[i][0][0].purchasedprodid, shopid: UserService.getUser().shopid }).then(function(result) {
+            //     //         // WSService.close();
+            //     //     }, function(err) {
 
+            //     //     });
+            //     // }
+            // });
+            //end
+            function updatePrintAutoStt() {
+                for (var i = 0; i < data.result.length; i++) {
+                    APIService.api_update_PrintStatus({ purchasedprodid: data.result[i][0][0].purchasedprodid, shopid: UserService.getUser().shopid }).then(function(result) {
+                        // WSService.close();
+                        getListOrderComplete();
+                    }, function(err) {
 
-                            // WSService.close();
+                    });
+                }
+            };
+            //IN START
+            $ionicLoading.show({
+                template: '<ion-spinner icon="bubbles"></ion-spinner><p>Đang thực hiện In</p>',
+                content: 'Loading',
+                // animation: 'fade-in',
+                showBackdrop: true,
+                maxWidth: 200,
+            });
+            WSService.sendEvtControl(jsonObj).then(function(result) {
+                console.log(result.data);
+                var objStt = JSON.parse(result.data);
+                $ionicLoading.hide();
+                WSService.close();
+                console.log(objStt.error_code);
+                switch (objStt.error_code) {
+                    case Success_Not_error:
+                        //Statements executed when the result of expression matches value1
 
-                            // APIService.api_update_updatecachebill({ data: data, shopid: UserService.getUser().shopid }).then(function(result) {
-                            //     console.log(JSON.stringify('result'));
-                            //     console.log(JSON.stringify(result));
-                            // }, function(err) {
+                        updatePrintAutoStt();
+                        $scope.isShowOrderDetail = false;
+                        break;
 
-                            // });
+                    case Unknown_error:
+                        //Statements executed when the result of expression matches value2
 
-
-                        }, function(err) {
-
+                        $scope.isShowOrderDetail = false;
+                        PopupService.showPopup({
+                            type: 1,
+                            message: 'Unknown_error !! Opps Lỗi chưa xác định  !! ',
+                            buttonName: 'Unknown_error ',
+                            function: function() {
+                                PopupService.closePopup();
+                                // console.log(JSON.stringify($rootScope.configPopup));
+                            }
                         });
-                    }
-                    $timeout(function() {
-                        WSService.send(jsonObj);
+                        break;
 
-                        // getListOrderComplete(function() {
-                        //         $scope.getOrderCompleteDetail(cartid);
-                        //     });
+                    case initizalize:
+                        //Statements executed when the result of expression matches valueN
 
-                    }, 500);
-                    $timeout(function() {
-                        console.log('dock response');
-                        console.log(JSON.stringify($rootScope.response));
+                        $scope.isShowOrderDetail = false;
+                        PopupService.showPopup({
+                            type: 1,
+                            message: 'Có lỗi xảy ra !! ',
+                            buttonName: 'initizalize ',
+                            function: function() {
+                                PopupService.closePopup();
+                                // console.log(JSON.stringify($rootScope.configPopup));
+                            }
+                        });
+                        break;
 
-                        // getListOrderComplete(function() {
-                        //         $scope.getOrderCompleteDetail(cartid);
-                        //     });
+                    case Service_failed:
+                        //Statements executed when the result of expression matches value2
 
-                    }, 700);
+                        $scope.isShowOrderDetail = false;
+                        PopupService.showPopup({
+                            type: 1,
+                            message: 'Service_failed- Lỗi thiết bị Dock - rs dock !! ',
+                            buttonName: 'Service_failed ',
+                            function: function() {
+                                PopupService.closePopup();
+                                // console.log(JSON.stringify($rootScope.configPopup));
+                            }
+                        });
+                        break;
 
+                    case Invalid_data:
+                        //Statements executed when the result of expression matches value2
+
+                        $scope.isShowOrderDetail = false;
+                        PopupService.showPopup({
+                            type: 1,
+                            message: 'Invalid_data - Dữ liệu máy in bị lỗi!! ',
+                            buttonName: 'Invalid_data ',
+                            function: function() {
+                                PopupService.closePopup();
+                                // console.log(JSON.stringify($rootScope.configPopup));
+                            }
+                        });
+                        break;
+
+                    case Print_device_error:
+                        //Statements executed when the result of expression matches value2
+
+                        $scope.isShowOrderDetail = false;
+                        PopupService.showPopup({
+                            type: 1,
+                            message: ' Có lỗi với máy in, Kiểm tra lại máy in và cấu hình lại cho máy in !! ',
+                            buttonName: 'OK',
+                            function: function() {
+                                PopupService.closePopup();
+                                // console.log(JSON.stringify($rootScope.configPopup));
+                            }
+                        });
+                        break;
+
+
+                    default:
+                        //Statements executed when none of the values match the value of the expression
+
+                        $scope.isShowOrderDetail = false;
+                        PopupService.showPopup({
+                            type: 1,
+                            message: ' Lỗi thiết bị: Reset App hoặc bộ thiết bị DOCK. ',
+                            buttonName: 'OK',
+                            function: function() {
+                                PopupService.closePopup();
+                                // console.log(JSON.stringify($rootScope.configPopup));
+                            }
+                        });
+                        break;
 
                 }
 
-            }, 300);
-            //Kiem tra co dang ket noi voi dock hay khong
-        }
+            }, function(err) {
+                $ionicLoading.hide();
+                console.log(err);
+                var statusPrint = false;
+                var count = 15;
+                var timerId = $interval(function() {
+                    WSService.sendEvtControl(jsonObj).then(function(result) {
+                        console.log('ResendEvtControl Dock thành công !');
+                        console.log(result.data);
+                        var objStt = JSON.parse(result.data);
+                        $interval.cancel(timerId);
+                        $ionicLoading.hide();
+                        WSService.close();
+                        console.log(objStt.error_code);
+                        switch (objStt.error_code) {
+                            case Success_Not_error:
+                                //Statements executed when the result of expression matches value1
+
+                                updatePrintAutoStt();
+                                // viewBillPopup.close();
+                                $scope.isShowOrderDetail = false;
+                                break;
+
+                            case Unknown_error:
+                                //Statements executed when the result of expression matches value2
+
+                                viewBillPopup.close();
+                                $scope.isShowOrderDetail = false;
+                                PopupService.showPopup({
+                                    type: 1,
+                                    message: 'Có lỗi xảy ra !! ',
+                                    buttonName: 'Unknown_error ',
+                                    function: function() {
+                                        PopupService.closePopup();
+                                        // console.log(JSON.stringify($rootScope.configPopup));
+                                    }
+                                });
+                                break;
+
+                            case initizalize:
+                                //Statements executed when the result of expression matches valueN
+
+                                viewBillPopup.close();
+                                $scope.isShowOrderDetail = false;
+                                PopupService.showPopup({
+                                    type: 1,
+                                    message: 'Có lỗi xảy ra !! ',
+                                    buttonName: 'initizalize ',
+                                    function: function() {
+                                        PopupService.closePopup();
+                                        // console.log(JSON.stringify($rootScope.configPopup));
+                                    }
+                                });
+                                break;
+
+                            case Service_failed:
+                                //Statements executed when the result of expression matches value2
+
+                                viewBillPopup.close();
+                                $scope.isShowOrderDetail = false;
+                                PopupService.showPopup({
+                                    type: 1,
+                                    message: 'Có lỗi xảy ra !! ',
+                                    buttonName: 'Service_failed ',
+                                    function: function() {
+                                        PopupService.closePopup();
+                                        // console.log(JSON.stringify($rootScope.configPopup));
+                                    }
+                                });
+                                break;
+
+                            case Invalid_data:
+                                //Statements executed when the result of expression matches value2
+
+                                viewBillPopup.close();
+                                $scope.isShowOrderDetail = false;
+                                PopupService.showPopup({
+                                    type: 1,
+                                    message: 'Có lỗi xảy ra !! ',
+                                    buttonName: 'Invalid_data ',
+                                    function: function() {
+                                        PopupService.closePopup();
+                                        // console.log(JSON.stringify($rootScope.configPopup));
+                                    }
+                                });
+                                break;
+
+                            case Print_device_error:
+                                //Statements executed when the result of expression matches value2
+
+                                viewBillPopup.close();
+                                $scope.isShowOrderDetail = false;
+                                PopupService.showPopup({
+                                    type: 1,
+                                    message: 'Có lỗi xảy ra !! ',
+                                    buttonName: 'Máy in chưa được bật hoặc thiếu giấy reset máy in',
+                                    function: function() {
+                                        PopupService.closePopup();
+                                        // console.log(JSON.stringify($rootScope.configPopup));
+                                    }
+                                });
+                                break;
+
+
+                            default:
+                                //Statements executed when none of the values match the value of the expression
+
+                                viewBillPopup.close();
+                                $scope.isShowOrderDetail = false;
+                                PopupService.showPopup({
+                                    type: 1,
+                                    message: ' Có lỗi xảy ra : Vui lòng reset App hoặc bộ thiết bị . ',
+                                    buttonName: 'OK',
+                                    function: function() {
+                                        PopupService.closePopup();
+                                        // console.log(JSON.stringify($rootScope.configPopup));
+                                    }
+                                });
+                                break;
+
+                        }
+
+
+
+
+
+
+                    }, function(err) {
+                        console.log('Lỗi in lại :' + err);
+                    });
+                    if (count <= 0) {
+                        $interval.cancel(timerId);
+                        console.log('Không thể reconnect tới dock');
+                        $ionicLoading.show({
+                            template: '<ion-spinner icon="bubbles"></ion-spinner><p>Kiểm tra lại Wifi hiện tại</p>',
+                            content: 'Loading',
+                            // animation: 'fade-in',
+                            showBackdrop: true,
+                            maxWidth: 200,
+                        });
+                        $timeout(function() {
+                            viewBillPopup.close();
+                            $scope.isShowOrderDetail = false;
+                            $ionicLoading.hide()
+                        }, 3000);
+                    }
+                    if (statusPrint == false) {
+                        PopupService.showPopup({
+                            type: 1,
+                            message: 'Kết nối lại với dock - Kiểm tra wifi hiện tại',
+                            buttonName: 'Reconnect ' + count,
+                            function: function() {
+                                PopupService.closePopup();
+                                // console.log(JSON.stringify($rootScope.configPopup));
+                            }
+                        });
+                        console.log('kết nối lại lần thứ : ' + count);
+                        count -= 1;
+                    } else {
+                        console.log('kết nối lại thành công !')
+                        $interval.cancel(timerId);
+                        count = 0;
+                    }
+
+
+                }, 2000);
+
+
+
+
+            });
+            //END
+
+
+
+        } //
 
         function getListOrderComplete(callback) {
-            console.log(JSON.stringify($rootScope.response));
+            // console.log(JSON.stringify($rootScope.response));
             // console.log(UserService.getUser().userinfo.newFunction == "true");
             var apiData = {
                 // 3 - 8
-                cartStatus: 8,
+                cartStatus: 18,
                 // 5 -11
                 prodStatus: 11,
                 userid: UserService.getUser().userid
@@ -238,6 +517,7 @@ angular.module('starter.controllers.CashierController', [])
             APIService.api_get_history_order(apiData).then(function(result) {
                 $scope.listOrderComplete = result.data;
                 // console.log(JSON.stringify(result.data));
+
                 // for (var i = 0; i < $scope.listOrderComplete.length; i++) {
                 //     var total = 0;
                 //     for (var j = 0; j < $scope.listOrderComplete[i].products.length; j++) {
@@ -293,7 +573,7 @@ angular.module('starter.controllers.CashierController', [])
                     $scope.viewBill = function() {
                         // console.log($rootScope.utils.activeFunFromUser(UserService.getUser().roleid,6));
                         //Mở kết nối DockSever
-                        WSService.start($rootScope.dockUrl);
+                        // WSService.start($rootScope.dockUrl);
 
 
 
@@ -349,7 +629,8 @@ angular.module('starter.controllers.CashierController', [])
                             // if ($scope.currentOrderInBill.products[i].isChecked) {
                             $scope.currentOrderInBill.cart.subTotal += $scope.currentOrderInBill.products[i].price;
                             if ($scope.currentOrderInBill.products[i].prodstat != 6) {
-                                $scope.currentOrderInBill.cart.svfee += $scope.currentOrderInBill.products[i].svfee;
+                                //svfee tạm thời của bờ hồ x2 = 10%
+                                $scope.currentOrderInBill.cart.svfee += $scope.currentOrderInBill.products[i].svfee * 2;
                             }
 
                         }
@@ -362,134 +643,448 @@ angular.module('starter.controllers.CashierController', [])
                         ClosePopupService.register(viewBillPopup);
                         $scope.closeDetailPopupClick = function() {
                             viewBillPopup.close();
-                            WSService.close();
                         }
                         $scope.bill = function() {
                             //Duong test print
+                            function updateSttPrint() {
+                                for (var j = 0; j < $scope.orderCompleteDetail.products.length; j++) {
+                                    // if ($scope.orderCompleteDetail.products[j].isChecked) {
+                                    var apiData = {
+                                        // 4-12
+                                        funid: UserService.getUser().userinfo.newFunction == "true" ? FuncProc.NeworderCompleteDetail.funid : FuncProc.OldorderCompleteDetail.cartStatus,
+                                        purchasepProdid: $scope.orderCompleteDetail.products[j].purchasedprodid,
+                                        cartid: cart.cart.cartid,
+                                        prodid: $scope.orderCompleteDetail.products[j].prodid,
+                                        quantity: null,
+                                        price: null,
+                                        svfee: null,
+                                        shopchairid: $scope.orderCompleteDetail.products[j].shopcharid,
+                                        optiondetail1: $scope.orderCompleteDetail.products[j].optdetailid1,
+                                        optiondetail2: $scope.orderCompleteDetail.products[j].optdetailid2,
+                                        optiondetail3: $scope.orderCompleteDetail.products[j].optdetailid3,
+                                        // optiondetail:
+                                        desc: null
+                                    }
+                                    console.log(JSON.stringify(apiData));
+                                    APIService.api_update_product(apiData).then(function(result) {
+                                        // console.log(JSON.stringify(result));
+                                        getListOrderComplete();
+                                        // WSService.close();
+                                    }, function(err) {
+                                        // body...
+                                        $ionicLoading.hide();
+                                        console.log(JSON.stringify(err));
+                                    });
 
+                                }
+
+                            };
                             if (!$rootScope.utils.activeFunFromUser(UserService.getUser().roleid, 6)) {
+                                // $ionicLoading.show({
+                                //     template: '<ion-spinner icon="bubbles"></ion-spinner><p>Chức năng chỉ dành cho Quản Lý</p>',
+                                //     content: 'Loading',
+                                //     // animation: 'fade-in',
+                                //     showBackdrop: true,
+                                //     maxWidth: 200,
+                                // });
+                                // $timeout(function() { $ionicLoading.hide() }, 2000);
+                                PopupService.showPopup({
+                                    type: 1,
+                                    message: 'Chức năng hiện tại chỉ dành cho Quản Lý',
+                                    buttonName: 'OK',
+                                    function: function() {
+                                        PopupService.closePopup();
+                                        console.log(JSON.stringify($rootScope.configPopup));
+                                    }
+                                });
+                            } else {
+                                console.log($rootScope.isConnected);
+                                // if (!$rootScope.isConnected) {
+                                // $ionicLoading.show({
+                                //     template: '<ion-spinner icon="bubbles"></ion-spinner><p>Kết nối với máy In có vấn đề !!! </p>',
+                                //     content: 'Loading',
+                                //     // animation: 'fade-in',
+                                //     showBackdrop: true,
+                                //     maxWidth: 200,
+                                // });
+                                // $timeout(function() { $ionicLoading.hide() }, 1500);
+                                // } else {
+
+
+                                // var test= $scope.sendMsgGetDeviceList();
+                                console.log(JSON.stringify(UserService.getUser().shops[0].shopaddress));
+                                var jsonObj = WSService.getHeader(MSG_C2S_PRINT_TEMPLATE_BY_VID);
+                                //Duong truyen cung uid thiet bi can setup lai sau
+                                // jsonObj.uid = UserService.getUser().shops[0].printid;
+                                console.log(JSON.stringify(jsonObj.uid));
+                                // jsonObj.uid = "0416:5011";
+                                // jsonObj.template_type = 13;// jsonObj.paper_type = 0;
+
+
+                                // jsonObj.template_type = 13;
+                                // jsonObj.paper_type = 0;
+
+                                var items = [];
+                                var quantit = 1;
+                                for (var j = 0; j < $scope.currentOrderInBill.bill_product.length; j++) {
+                                    items.push({
+                                        "item_name": $rootScope.utils.formatUnikey($scope.currentOrderInBill.bill_product[j].item_name) + "",
+                                        "quantity": $scope.currentOrderInBill.bill_product[j].quantity + "",
+                                        "amount": $rootScope.utils.formatUnikey($rootScope.utils.formatMoney($scope.currentOrderInBill.bill_product[j].amount * $scope.currentOrderInBill.bill_product[j].quantity)) + ""
+                                    });
+                                }
+                                console.log(JSON.stringify($scope.currentOrderInBill.cart.subTotal));
+                                var time = $rootScope.utils.formatDateView(cart.cart.ordertime);
+
+                                var moneyfee = $rootScope.utils.formatUnikey($rootScope.utils.formatMoney($scope.currentOrderInBill.cart.svfee));
+                                // console.log(moneyfee);
+                                var moneyTotal = $rootScope.utils.formatUnikey($rootScope.utils.formatMoney($scope.currentOrderInBill.cart.subTotal + $scope.currentOrderInBill.cart.svfee));
+                                // console.log(JSON.stringify(items));
+                                // console.log(JSON.stringify($scope.currentOrderInBill.bill_product));
+                                console.log(moneyTotal);
+                                var dataJson = {
+                                    "title": "Helio",
+                                    "sub_title": "Vietnam Specialty Coffee",
+                                    "address": UserService.getUser().shops[0].shopaddress,
+                                    "tel": UserService.getUser().shops[0].shopphone,
+                                    "datetime": time + "",
+                                    "receipt_num": cart.cart.cartnumb + "",
+                                    "shift": UserService.getUser().username + "",
+                                    "table": cart.cart.shoptablename + "",
+                                    "service_charge_percent": "10%",
+                                    "service_charge_value": moneyfee + "",
+                                    "total": moneyTotal + "",
+                                    "footer1": "Thank you for coming !",
+                                    "footer2": "( BẢN IN LẠI  )",
+                                    "item": items
+                                };
+
+                                jsonObj.data = {
+                                    "uid": UserService.getUser().shops[0].printid,
+                                    "template_type": 13,
+                                    "paper_type": 0,
+                                    "print_data": JSON.stringify(dataJson)
+
+                                };
+                                // jsonObj.print_data = JSON.stringify(dataJson);
+                                console.log(jsonObj);
+
                                 $ionicLoading.show({
-                                    template: '<ion-spinner icon="bubbles"></ion-spinner><p>Chức năng chỉ dành cho Quản Lý</p>',
+                                    template: '<ion-spinner icon="bubbles"></ion-spinner><p>Đang thực hiện In</p>',
                                     content: 'Loading',
                                     // animation: 'fade-in',
                                     showBackdrop: true,
                                     maxWidth: 200,
                                 });
-                                $timeout(function() { $ionicLoading.hide() }, 1500);
-                            } else {
-                                console.log($rootScope.Connect);
-                                if ($rootScope.Connect == 0) {
-                                    $ionicLoading.show({
-                                        template: '<ion-spinner icon="bubbles"></ion-spinner><p>Kết nối với máy In có vấn đề !!! </p>',
-                                        content: 'Loading',
-                                        // animation: 'fade-in',
-                                        showBackdrop: true,
-                                        maxWidth: 200,
-                                    });
-                                    $timeout(function() { $ionicLoading.hide() }, 1500);
-                                } else {
+                                WSService.sendEvtControl(jsonObj).then(function(result) {
+                                    console.log(result.data);
+                                    var objStt = JSON.parse(result.data);
+                                    $ionicLoading.hide();
+                                    WSService.close();
+                                    // if (result.data.error_code == 0) {
 
+                                    //     updateSttPrint();
+                                    //     viewBillPopup.close();
+                                    //     $scope.isShowOrderDetail = false;
+                                    //     // }
+                                    // }
+                                    console.log(objStt.error_code);
+                                    switch (objStt.error_code) {
+                                        case Success_Not_error:
+                                            //Statements executed when the result of expression matches value1
+                                            console.log('In thành công ghi log');
+                                            updateSttPrint();
+                                            viewBillPopup.close();
+                                            $scope.isShowOrderDetail = false;
+                                            break;
 
-                                    // var test= $scope.sendMsgGetDeviceList();
-                                    console.log(JSON.stringify(UserService.getUser().shops[0].shopaddress));
-                                    var jsonObj = WSService.getHeader(104);
-                                    //Duong truyen cung uid thiet bi can setup lai sau
-                                    jsonObj.uid = UserService.getUser().shops[0].printid;
-                                    console.log(JSON.stringify(jsonObj.uid));
-                                    // jsonObj.uid = "0416:5011";
-                                    // jsonObj.template_type = 13;// jsonObj.paper_type = 0;
+                                        case Unknown_error:
+                                            //Statements executed when the result of expression matches value2
 
-
-                                    jsonObj.print_tpl = 13;
-                                    jsonObj.paper_type = 0;
-
-                                    var items = [];
-                                    var quantit = 1;
-                                    for (var j = 0; j < $scope.currentOrderInBill.bill_product.length; j++) {
-                                        items.push({
-                                            "item_name": $rootScope.utils.formatUnikey($scope.currentOrderInBill.bill_product[j].item_name) + "",
-                                            "quantity": $scope.currentOrderInBill.bill_product[j].quantity + "",
-                                            "amount": $rootScope.utils.formatUnikey($rootScope.utils.formatMoney($scope.currentOrderInBill.bill_product[j].amount * $scope.currentOrderInBill.bill_product[j].quantity)) + ""
-                                        });
-                                    }
-                                    console.log(JSON.stringify($scope.currentOrderInBill.cart.subTotal));
-                                    var time = $rootScope.utils.formatDateView(cart.cart.ordertime);
-
-                                    var moneyfee = $rootScope.utils.formatUnikey($rootScope.utils.formatMoney($scope.currentOrderInBill.cart.svfee));
-                                    // console.log(moneyfee);
-                                    var moneyTotal = $rootScope.utils.formatUnikey($rootScope.utils.formatMoney($scope.currentOrderInBill.cart.subTotal + $scope.currentOrderInBill.cart.svfee));
-                                    // console.log(JSON.stringify(items));
-                                    // console.log(JSON.stringify($scope.currentOrderInBill.bill_product));
-                                    console.log(moneyTotal);
-                                    var dataJson = {
-                                        "title": "Helio",
-                                        "sub_title": "Vietnam Specialty Coffee",
-                                        "address": UserService.getUser().shops[0].shopaddress,
-                                        "tel": UserService.getUser().shops[0].shopphone,
-                                        "datetime": time + "",
-                                        "receipt_num": cart.cart.cartnumb + "",
-                                        "shift": UserService.getUser().username + "",
-                                        "table": cart.cart.shoptablename + "",
-                                        "service_charge_percent": "5%",
-                                        "service_charge_value": moneyfee + "",
-                                        "total": moneyTotal + "",
-                                        "footer1": "Thank you for coming !",
-                                        "footer2": "( BẢN IN LẠI  )",
-                                        "item": items
-                                    };
-
-                                    jsonObj.print_data = JSON.stringify(dataJson);
-                                    jsonObj.print = dataJson;
-                                    console.log(jsonObj.print_data);
-
-                                    $timeout(function() {
-
-                                        WSService.send(jsonObj);
-                                        // $timeout(function() {
-                                        //     if ($rootScope.response) {
-                                        //         console.log(JSON.stringify($rootScope.response));
-                                        //     }
-                                        // }, 100);
-                                    }, 400);
-                                    //end test
-
-                                    for (var j = 0; j < $scope.orderCompleteDetail.products.length; j++) {
-                                        if ($scope.orderCompleteDetail.products[j].isChecked) {
-                                            console.log('check' + JSON.stringify($scope.orderCompleteDetail.products[j]))
-
-                                            var apiData = {
-                                                // 4-12
-                                                funid: UserService.getUser().userinfo.newFunction == "true" ? FuncProc.NeworderCompleteDetail.funid : FuncProc.OldorderCompleteDetail.cartStatus,
-                                                purchasepProdid: $scope.orderCompleteDetail.products[j].purchasedprodid,
-                                                cartid: cart.cart.cartid,
-                                                prodid: $scope.orderCompleteDetail.products[j].prodid,
-                                                quantity: null,
-                                                price: null,
-                                                svfee: null,
-                                                shopchairid: $scope.orderCompleteDetail.products[j].shopcharid,
-                                                optiondetail1: $scope.orderCompleteDetail.products[j].optdetailid1,
-                                                optiondetail2: $scope.orderCompleteDetail.products[j].optdetailid2,
-                                                optiondetail3: $scope.orderCompleteDetail.products[j].optdetailid3,
-                                                // optiondetail:
-                                                desc: null
-                                            }
-                                            console.log(JSON.stringify(apiData));
-                                            APIService.api_update_product(apiData).then(function(result) {
-                                                console.log(JSON.stringify(result));
-                                                getListOrderComplete();
-                                                // WSService.close();
-                                            }, function(err) {
-                                                // body...
-                                                console.log(JSON.stringify(err));
+                                            viewBillPopup.close();
+                                            $scope.isShowOrderDetail = false;
+                                            PopupService.showPopup({
+                                                type: 1,
+                                                message: 'Unknown_error !! Opps Lỗi chưa xác định  !! ',
+                                                buttonName: 'Unknown_error ',
+                                                function: function() {
+                                                    PopupService.closePopup();
+                                                    // console.log(JSON.stringify($rootScope.configPopup));
+                                                }
                                             });
-                                        }
+                                            break;
+
+                                        case initizalize:
+                                            //Statements executed when the result of expression matches valueN
+
+                                            viewBillPopup.close();
+                                            $scope.isShowOrderDetail = false;
+                                            PopupService.showPopup({
+                                                type: 1,
+                                                message: 'Có lỗi xảy ra !! ',
+                                                buttonName: 'initizalize ',
+                                                function: function() {
+                                                    PopupService.closePopup();
+                                                    // console.log(JSON.stringify($rootScope.configPopup));
+                                                }
+                                            });
+                                            break;
+
+                                        case Service_failed:
+                                            //Statements executed when the result of expression matches value2
+
+                                            viewBillPopup.close();
+                                            $scope.isShowOrderDetail = false;
+                                            PopupService.showPopup({
+                                                type: 1,
+                                                message: 'Service_failed- Lỗi thiết bị Dock - rs dock !! ',
+                                                buttonName: 'Service_failed ',
+                                                function: function() {
+                                                    PopupService.closePopup();
+                                                    // console.log(JSON.stringify($rootScope.configPopup));
+                                                }
+                                            });
+                                            break;
+
+                                        case Invalid_data:
+                                            //Statements executed when the result of expression matches value2
+
+                                            viewBillPopup.close();
+                                            $scope.isShowOrderDetail = false;
+                                            PopupService.showPopup({
+                                                type: 1,
+                                                message: 'Invalid_data - Dữ liệu máy in bị lỗi!! ',
+                                                buttonName: 'Invalid_data ',
+                                                function: function() {
+                                                    PopupService.closePopup();
+                                                    // console.log(JSON.stringify($rootScope.configPopup));
+                                                }
+                                            });
+                                            break;
+
+                                        case Print_device_error:
+                                            //Statements executed when the result of expression matches value2
+
+                                            viewBillPopup.close();
+                                            $scope.isShowOrderDetail = false;
+                                            PopupService.showPopup({
+                                                type: 1,
+                                                message: ' Có lỗi với máy in, Kiểm tra lại máy in và cấu hình lại cho máy in !! ',
+                                                buttonName: 'OK',
+                                                function: function() {
+                                                    PopupService.closePopup();
+                                                    // console.log(JSON.stringify($rootScope.configPopup));
+                                                }
+                                            });
+                                            break;
+
+
+                                        default:
+                                            //Statements executed when none of the values match the value of the expression
+
+                                            viewBillPopup.close();
+                                            $scope.isShowOrderDetail = false;
+                                            PopupService.showPopup({
+                                                type: 1,
+                                                message: ' Lỗi thiết bị: Reset App hoặc bộ thiết bị DOCK. ',
+                                                buttonName: 'OK',
+                                                function: function() {
+                                                    PopupService.closePopup();
+                                                    // console.log(JSON.stringify($rootScope.configPopup));
+                                                }
+                                            });
+                                            break;
+
                                     }
-                                    viewBillPopup.close();
-                                    $scope.isShowOrderDetail = false;
-                                    // console.log('getListOrderComplete 5');
-                                    // getListOrderComplete();
-                                    getListOrderComplete();
-                                }
+
+                                }, function(err) {
+                                    $ionicLoading.hide();
+                                    console.log(err);
+                                    var statusPrint = false;
+                                    var count = 15;
+                                    var timerId = $interval(function() {
+                                        WSService.sendEvtControl(jsonObj).then(function(result) {
+                                            console.log('ResendEvtControl Dock thành công !');
+                                            console.log(result.data);
+                                            var objStt = JSON.parse(result.data);
+                                            $interval.cancel(timerId);
+                                            $ionicLoading.hide();
+                                            WSService.close();
+                                            console.log(objStt.error_code);
+                                            switch (objStt.error_code) {
+                                                case Success_Not_error:
+                                                    //Statements executed when the result of expression matches value1
+
+                                                    updateSttPrint();
+                                                    viewBillPopup.close();
+                                                    $scope.isShowOrderDetail = false;
+                                                    break;
+
+                                                case Unknown_error:
+                                                    //Statements executed when the result of expression matches value2
+
+                                                    viewBillPopup.close();
+                                                    $scope.isShowOrderDetail = false;
+                                                    PopupService.showPopup({
+                                                        type: 1,
+                                                        message: 'Có lỗi xảy ra !! ',
+                                                        buttonName: 'Unknown_error ',
+                                                        function: function() {
+                                                            PopupService.closePopup();
+                                                            // console.log(JSON.stringify($rootScope.configPopup));
+                                                        }
+                                                    });
+                                                    break;
+
+                                                case initizalize:
+                                                    //Statements executed when the result of expression matches valueN
+
+                                                    viewBillPopup.close();
+                                                    $scope.isShowOrderDetail = false;
+                                                    PopupService.showPopup({
+                                                        type: 1,
+                                                        message: 'Có lỗi xảy ra !! ',
+                                                        buttonName: 'initizalize ',
+                                                        function: function() {
+                                                            PopupService.closePopup();
+                                                            // console.log(JSON.stringify($rootScope.configPopup));
+                                                        }
+                                                    });
+                                                    break;
+
+                                                case Service_failed:
+                                                    //Statements executed when the result of expression matches value2
+
+                                                    viewBillPopup.close();
+                                                    $scope.isShowOrderDetail = false;
+                                                    PopupService.showPopup({
+                                                        type: 1,
+                                                        message: 'Có lỗi xảy ra !! ',
+                                                        buttonName: 'Service_failed ',
+                                                        function: function() {
+                                                            PopupService.closePopup();
+                                                            // console.log(JSON.stringify($rootScope.configPopup));
+                                                        }
+                                                    });
+                                                    break;
+
+                                                case Invalid_data:
+                                                    //Statements executed when the result of expression matches value2
+
+                                                    viewBillPopup.close();
+                                                    $scope.isShowOrderDetail = false;
+                                                    PopupService.showPopup({
+                                                        type: 1,
+                                                        message: 'Có lỗi xảy ra !! ',
+                                                        buttonName: 'Invalid_data ',
+                                                        function: function() {
+                                                            PopupService.closePopup();
+                                                            // console.log(JSON.stringify($rootScope.configPopup));
+                                                        }
+                                                    });
+                                                    break;
+
+                                                case Print_device_error:
+                                                    //Statements executed when the result of expression matches value2
+
+                                                    viewBillPopup.close();
+                                                    $scope.isShowOrderDetail = false;
+                                                    PopupService.showPopup({
+                                                        type: 1,
+                                                        message: 'Có lỗi xảy ra !! ',
+                                                        buttonName: 'Máy in chưa được bật hoặc thiếu giấy reset máy in',
+                                                        function: function() {
+                                                            PopupService.closePopup();
+                                                            // console.log(JSON.stringify($rootScope.configPopup));
+                                                        }
+                                                    });
+                                                    break;
+
+
+                                                default:
+                                                    //Statements executed when none of the values match the value of the expression
+
+                                                    viewBillPopup.close();
+                                                    $scope.isShowOrderDetail = false;
+                                                    PopupService.showPopup({
+                                                        type: 1,
+                                                        message: ' Có lỗi xảy ra : Vui lòng reset App hoặc bộ thiết bị . ',
+                                                        buttonName: 'OK',
+                                                        function: function() {
+                                                            PopupService.closePopup();
+                                                            // console.log(JSON.stringify($rootScope.configPopup));
+                                                        }
+                                                    });
+                                                    break;
+
+                                            }
+
+
+
+
+
+
+                                        }, function(err) {
+                                            console.log('Lỗi in lại :' + err);
+                                        });
+                                        if (statusPrint == false) {
+                                           
+
+                                            if (count < 0) {
+                                            $interval.cancel(timerId);
+                                            $ionicLoading.hide();
+                                            console.log('Không thể reconnect tới dock');
+                                            PopupService.showPopup({
+                                                type: 1,
+                                                message: 'Kiểm tra lại Wifi hiện tại  ',
+                                                buttonName: 'OK',
+                                                function: function() {
+                                                    PopupService.closePopup();
+                                                    // console.log(JSON.stringify($rootScope.configPopup));
+                                                }
+                                            });
+                                            // $ionicLoading.show({
+                                            //     template: '<ion-spinner icon="bubbles"></ion-spinner><p>Kiểm tra lại Wifi hiện tại</p>',
+                                            //     content: 'Loading',
+                                            //     // animation: 'fade-in',
+                                            //     showBackdrop: true,
+                                            //     maxWidth: 200,
+                                            // });
+                                            // $timeout(function() {
+                                            //     viewBillPopup.close();
+                                            //     $scope.isShowOrderDetail = false;
+                                            //     $ionicLoading.hide()
+                                            // }, 3000);
+                                        }else{
+                                             viewBillPopup.close();
+                                            $scope.isShowOrderDetail = false;
+                                            $ionicLoading.show({
+                                                template: '<ion-spinner icon="bubbles"></ion-spinner><p>Đang thử In lại ' + count + '</p>',
+                                                content: 'Loading',
+                                                // animation: 'fade-in',
+                                                showBackdrop: false,
+                                                maxWidth: 200,
+                                            });
+                                            console.log('kết nối lại lần thứ : ' + count);
+                                            count -= 1;
+                                        }
+
+
+                                        } else {
+                                            console.log('kết nối lại thành công !')
+                                            $interval.cancel(timerId);
+                                            count = 0;
+                                        }
+                                        
+
+
+                                    }, 2000);
+
+
+
+
+                                });
+
                             }
                         }
                     }

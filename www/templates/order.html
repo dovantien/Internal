@@ -14,6 +14,14 @@
             </div>
             <div style="height:30px;text-align: center;"></div>
         </ion-content>
+
+        <button ion-button color="light" style="position: absolute;
+    right: 37vw;
+    top: 135px;
+    border-radius: 5px;
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.4);
+    background: ##e5e5e5;
+    " ng-click="addCartOnline()">Add Cart Online</button>
         <div class="order_div_userinfo">
             <div class="order_username">{{user.username}}</div>
             <div class="order_userid">Mã số: {{user.userid}}</div>
@@ -34,7 +42,7 @@
     width: 45px;
     top: -14px;
     font-size: 200%;
-    color: rgba(0, 0, 0, 0.7);" ng-click="clickScanQR()"></div>
+    color: rgba(0, 0, 0, 0.7);" ng-click="addCartOnline()"></div>
             <!-- <div class="option_showdetail ng-hide" style=" right: inherit;  width: 94%; height: 70%; overflow: auto;" ng-show="isShow">
                
                 <div>

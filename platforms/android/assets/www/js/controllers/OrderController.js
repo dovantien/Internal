@@ -4,6 +4,7 @@ angular.module('starter.controllers.OrderController', [])
         console.log('order');
         $scope.listProd = [];
         $scope.isOrder = true;
+        $scope.isonlineOder = true;
         var listAllProducts = null;
         var detailPopupOption = null;
         $scope.quantity_product = 1;
@@ -31,8 +32,9 @@ angular.module('starter.controllers.OrderController', [])
             $cordovaNativeAudio.preloadSimple('noti', 'sounds/noti.mp3');
         }
 
-        var socket = io('http://it.mycafe.co:3011');
-            // var socket = io('http://mycafe.co:3011');
+
+        // var socket = io('http://it.mycafe.co:3011');
+            var socket = io('http://mycafe.co:3011');
         socket.on('connected', function() {
             console.log('connected')
             $ionicLoading.hide();
@@ -84,7 +86,6 @@ angular.module('starter.controllers.OrderController', [])
         
         //end
 
-       
         var getProducts = function(verImg) {
             // console.log(JSON.stringify(UserService.getCacheImage()))
             // UserService.setCacheImage([]);
@@ -160,21 +161,43 @@ angular.module('starter.controllers.OrderController', [])
                 // }
             });
         }
-        $scope.showlistTable = function() {
-            $scope.isShow = true;
-            $scope.chooseTable = function(index) {
-                console.log(index);
-                // tắt khi build 
-                // var test={"shoptableid":164,"shopid":1,"shoptablename":"Table 15"};
-                // $rootScope.listTable.selected = test;
+        //showlist
+         $scope.showlistTable = function(type) {
+      $scope.isShow = true;
+      $scope.chooseTable = function(index) {
+        console.log(index);
+        // tắt khi build 
+        // var test={"shoptableid":164,"shopid":1,"shoptablename":"Table 15"};
+        // $rootScope.listTable.selected = test;
 
-                $rootScope.listTable.selected = $rootScope.listTable.list[index];
-                $scope.isShow = false;
-                UserService.setCurrentTable($rootScope.listTable.selected);
-
-            }
-
+        $rootScope.listTable.selected = $rootScope.listTable.list[index];
+        $scope.isShow = false;
+        UserService.setCurrentTable($rootScope.listTable.selected);
+        console.log(type)
+        if (type == 2) {
+            console.log('zxczxcxz');
+          $scope.addCartOnline();
         }
+      }
+
+    }
+        //end showlist
+
+        // $scope.showlistTable = function() {
+        //     $scope.isShow = true;
+        //     $scope.chooseTable = function(index) {
+        //         console.log(index);
+        //         // tắt khi build 
+        //         // var test={"shoptableid":164,"shopid":1,"shoptablename":"Table 15"};
+        //         // $rootScope.listTable.selected = test;
+
+        //         $rootScope.listTable.selected = $rootScope.listTable.list[index];
+        //         $scope.isShow = false;
+        //         UserService.setCurrentTable($rootScope.listTable.selected);
+
+        //     }
+
+        // }
         $rootScope.listTable = {
             selected: null
         };
@@ -473,4 +496,66 @@ angular.module('starter.controllers.OrderController', [])
 
             }
         }
+
+
+        //add cart online
+        $scope.addCartOnline = function() {
+            console.log($rootScope.listTable.selected);
+      if ($rootScope.listTable.selected == null) {
+        console.log($rootScope.listTable.selected);
+        //$scope.clickScanQR
+        $scope.showlistTable(2);
+      } else {
+        console.log('zxzx');
+        var detailPopupAddCart = $ionicPopup.show({
+          scope: $scope,
+          templateUrl: 'templates/popup_addcart_online.html',
+          cssClass: 'od_full'
+        });
+        $scope.closePopup = function() {
+          detailPopupAddCart.close();
+        }
+
+        //cart online
+        $scope.doAddCartOnline = function(cartNumb) {
+            $scope.isonlineOder=false;
+            detailPopupAddCart.close();
+             $ionicLoading.show({
+                template: '<ion-spinner icon="bubbles"></ion-spinner><p>Đang xử lý ... </p>',
+                content: 'Loading',
+                // animation: 'fade-in',
+                showBackdrop: true,
+                maxWidth: 200,
+            });
+             $timeout(function() {$ionicLoading.hide();
+                $scope.isonlineOder=true;
+             }, 5000);
+          // console.log(cartNumb);
+          var api = {
+            "cartnumb": cartNumb,
+            "shopTableid": $rootScope.listTable.selected.shoptableid
+          }
+          console.log(api);
+        APIService.api_addpurchased_online(api).then(function(success) {
+            console.log(JSON.stringify(success));
+            $ionicLoading.hide();
+            $scope.isonlineOder=true;
+            PopupService.showPopup({
+              type: 1,
+              message: success.data.status.msg,
+              buttonName: 'OK',
+              function: function() {
+                PopupService.closePopup();
+              }
+            });
+          }, function(err) {
+            console.log(err);
+            $ionicLoading.hide();
+          });
+        }
+      }
+
+    }
+        //end cart online
+
     }); // End controller AuthController
