@@ -6,15 +6,16 @@ angular.module('starter.controllers.CashierController', [])
         var request_id = 1;
         var connectedSocket = 0;
         var print_stt = false;
+        // var listProd = [];
         // $rootScope.isConnected = false;
         $rootScope.dockUrl = "ws://192.168.35.1:9876/ws/";
-        // var socket = io('http://it.mycafe.co:3011');
-        var socket = io('http://mycafe.co:3011');
+        var socket = io('http://it.mycafe.co:3011');
+        // var socket = io('http://mycafe.co:3011');
         socket.on('connected', function() {
             console.log('connected')
             $ionicLoading.hide();
             // console.log('getListOrderComplete 1');
-            // getListOrderComplete();
+            getListOrderComplete();
             socket.emit('register', {
                 userid: UserService.getUser().userid,
                 shopid: UserService.getUser().shopid
@@ -22,7 +23,7 @@ angular.module('starter.controllers.CashierController', [])
 
             APIService.api_getcachebill({ shopid: UserService.getUser().shopid }).then(function(result) {
                 console.log(JSON.stringify('api_getcachebill'));
-                console.log(JSON.stringify(result));
+                // console.log(JSON.stringify(result));
             }, function(err) {
 
             });
@@ -112,7 +113,7 @@ angular.module('starter.controllers.CashierController', [])
                             if ($scope.Bill.bill_product[j].item_name == data.result[i][0][0].prodname) {
                                 $scope.Bill.bill_product[j].quantity += 1;
                                 $scope.Bill.cart.subTotal += $scope.Bill.bill_product[j].amount;
-                                $scope.Bill.cart.svfee += $scope.Bill.bill_product[j].amount * 10 / 100;
+                                $scope.Bill.cart.svfee += $scope.Bill.bill_product[j].amount * UserService.getUser().shops[0].svfee / 100;
                                 var check = true;
                             }
                         }
@@ -140,9 +141,9 @@ angular.module('starter.controllers.CashierController', [])
             for (var i = 0; i < $scope.Bill.bill_product.length; i++) {
                 console.log(JSON.stringify($scope.Bill.bill_product[i].amount));
                 $scope.Bill.cart.subTotal += $scope.Bill.bill_product[i].amount;
-                $scope.Bill.cart.svfee += $scope.Bill.bill_product[i].amount * 10 / 100;
+                $scope.Bill.cart.svfee += $scope.Bill.bill_product[i].amount * UserService.getUser().shops[0].svfee / 100;
             }
-
+            console.log($scope.Bill.cart.svfee);
             // WSService.start($rootScope.dockUrl);
             // $timeout(function() {
             console.log($rootScope.isConnected);
@@ -152,7 +153,7 @@ angular.module('starter.controllers.CashierController', [])
             var jsonObj = WSService.getHeader(MSG_C2S_PRINT_TEMPLATE_BY_VID);
             //Duong truyen cung uid thiet bi can setup lai sau
             jsonObj.error_code = "";
-            // jsonObj.uid = UserService.getUser().shops[0].printid;
+            // jsonObj.uid = UserService.getUser().shops[0].svfee;
             // // jsonObj.uid = "0416:5011";
             // // jsonObj.msg = "";
             // jsonObj.template_type = 13;
@@ -171,7 +172,7 @@ angular.module('starter.controllers.CashierController', [])
                 "receipt_num": data.result[0][0][0].cartnumb + "",
                 "shift": data.result[0][0][0].username + "",
                 "table": data.result[0][0][0].shoptablename + "",
-                "service_charge_percent": "10%",
+                "service_charge_percent": UserService.getUser().shops[0].svfee + "%",
                 "service_charge_value": moneyfee + "",
                 "total": moneyTotal + "",
                 "footer1": "Thank you for coming !",
@@ -202,14 +203,25 @@ angular.module('starter.controllers.CashierController', [])
             // });
             //end
             function updatePrintAutoStt() {
+                var listProd = [];
                 for (var i = 0; i < data.result.length; i++) {
-                    APIService.api_update_PrintStatus({ purchasedprodid: data.result[i][0][0].purchasedprodid, shopid: UserService.getUser().shopid }).then(function(result) {
-                        // WSService.close();
-                        getListOrderComplete();
-                    }, function(err) {
+                    console.log(data.result[i][0][0].purchasedprodid);
+                    listProd.push(data.result[i][0][0].purchasedprodid);
 
-                    });
+                    if (i == data.result.length - 1) {
+                        console.log(listProd);
+                        APIService.api_update_PrintStatus({ purchasedprodid: listProd, shopid: UserService.getUser().shopid }).then(function(result) {
+                            console.log(result);
+                            // WSService.close();
+                            getListOrderComplete();
+                        }, function(err) {
+
+                        });
+                    }
                 }
+
+
+
             };
             //IN START
             $ionicLoading.show({
@@ -225,10 +237,21 @@ angular.module('starter.controllers.CashierController', [])
                 $ionicLoading.hide();
                 WSService.close();
                 console.log(objStt.error_code);
+                var apiData = {
+                    shopid: UserService.getUser().shopid,
+                    status: objStt,
+                    logs: 'sendEvtControl'
+                };
+                console.log(apiData);
+                APIService.api_writeLogFile(apiData).then(function(result) {
+                    console.log(JSON.stringify(result));
+                }, function(err) {
+                    // body...
+                });
                 switch (objStt.error_code) {
                     case Success_Not_error:
                         //Statements executed when the result of expression matches value1
-
+                        // getListOrderComplete();
                         updatePrintAutoStt();
                         $scope.isShowOrderDetail = false;
                         break;
@@ -295,7 +318,6 @@ angular.module('starter.controllers.CashierController', [])
 
                     case Print_device_error:
                         //Statements executed when the result of expression matches value2
-
                         $scope.isShowOrderDetail = false;
                         PopupService.showPopup({
                             type: 1,
@@ -311,7 +333,6 @@ angular.module('starter.controllers.CashierController', [])
 
                     default:
                         //Statements executed when none of the values match the value of the expression
-
                         $scope.isShowOrderDetail = false;
                         PopupService.showPopup({
                             type: 1,
@@ -339,11 +360,22 @@ angular.module('starter.controllers.CashierController', [])
                         $interval.cancel(timerId);
                         $ionicLoading.hide();
                         WSService.close();
+                        var apiData = {
+                            shopid: UserService.getUser().shopid,
+                            status: objStt,
+                            logs: 'sendEvtControl'
+                        };
+                        console.log(apiData);
+                        APIService.api_writeLogFile(apiData).then(function(result) {
+                            console.log(JSON.stringify(result));
+                        }, function(err) {
+                            // body...
+                        });
                         console.log(objStt.error_code);
                         switch (objStt.error_code) {
                             case Success_Not_error:
                                 //Statements executed when the result of expression matches value1
-
+                                // getListOrderComplete();
                                 updatePrintAutoStt();
                                 // viewBillPopup.close();
                                 $scope.isShowOrderDetail = false;
@@ -456,34 +488,52 @@ angular.module('starter.controllers.CashierController', [])
                     }, function(err) {
                         console.log('Lỗi in lại :' + err);
                     });
-                    if (count <= 0) {
-                        $interval.cancel(timerId);
-                        console.log('Không thể reconnect tới dock');
-                        $ionicLoading.show({
-                            template: '<ion-spinner icon="bubbles"></ion-spinner><p>Kiểm tra lại Wifi hiện tại</p>',
-                            content: 'Loading',
-                            // animation: 'fade-in',
-                            showBackdrop: true,
-                            maxWidth: 200,
-                        });
-                        $timeout(function() {
-                            viewBillPopup.close();
-                            $scope.isShowOrderDetail = false;
-                            $ionicLoading.hide()
-                        }, 3000);
-                    }
+
                     if (statusPrint == false) {
-                        PopupService.showPopup({
-                            type: 1,
-                            message: 'Kết nối lại với dock - Kiểm tra wifi hiện tại',
-                            buttonName: 'Reconnect ' + count,
-                            function: function() {
-                                PopupService.closePopup();
-                                // console.log(JSON.stringify($rootScope.configPopup));
-                            }
-                        });
-                        console.log('kết nối lại lần thứ : ' + count);
-                        count -= 1;
+                        if (count < 0) {
+                            $interval.cancel(timerId);
+                            $ionicLoading.hide();
+                            console.log('Không thể reconnect tới dock');
+
+                            // $ionicLoading.show({
+                            //     template: '<ion-spinner icon="bubbles"></ion-spinner><p>Kiểm tra lại Wifi hiện tại</p>',
+                            //     content: 'Loading',
+                            //     // animation: 'fade-in',
+                            //     showBackdrop: true,
+                            //     maxWidth: 200,
+                            // });
+                            // $timeout(function() {
+                            // viewBillPopup.close();
+                            $scope.isShowOrderDetail = false;
+
+                            // }, 3000);
+                        } else {
+                            // PopupService.showPopup({
+                            //     type: 1,
+                            //     message: 'Kết nối lại với dock - Kiểm tra wifi hiện tại',
+                            //     buttonName: 'Reconnect ' + count,
+                            //     function: function() {
+                            //         PopupService.closePopup();
+                            //         // console.log(JSON.stringify($rootScope.configPopup));
+                            //     }
+                            // });
+                            // console.log('kết nối lại lần thứ : ' + count);
+                            // count -= 1;
+
+                            // viewBillPopup.close();
+                            $ionicLoading.hide();
+                            $scope.isShowOrderDetail = false;
+                            $ionicLoading.show({
+                                template: '<ion-spinner icon="bubbles"></ion-spinner><p>Đang thử In lại ' + count + '</p>',
+                                content: 'Loading',
+                                // animation: 'fade-in',
+                                showBackdrop: false,
+                                maxWidth: 200,
+                            });
+                            console.log('kết nối lại lần thứ : ' + count);
+                            count -= 1;
+
+                        }
                     } else {
                         console.log('kết nối lại thành công !')
                         $interval.cancel(timerId);
@@ -504,6 +554,7 @@ angular.module('starter.controllers.CashierController', [])
         } //
 
         function getListOrderComplete(callback) {
+            console.log('Reload list Cashier');
             // console.log(JSON.stringify($rootScope.response));
             // console.log(UserService.getUser().userinfo.newFunction == "true");
             var apiData = {
@@ -546,7 +597,7 @@ angular.module('starter.controllers.CashierController', [])
 
             for (var i = 0; i < $scope.listOrderComplete.length; i++) {
                 if ($scope.listOrderComplete[i].cart.cartid == cartid) {
-                    console.log('cart.cartid == cartid');
+                    // console.log('cart.cartid == cartid');
                     var cart = $scope.listOrderComplete[i];
                     for (var j = 0; j < $scope.listOrderComplete[i].products.length; j++) {
                         console.log(JSON.stringify($scope.listOrderComplete[i].products[j].prodstat));
@@ -556,7 +607,7 @@ angular.module('starter.controllers.CashierController', [])
                             $scope.listOrderComplete[i].products[j].isChecked = false;
                         }
                     }
-                    console.log(JSON.stringify($scope.listOrderComplete[i]));
+                    // console.log(JSON.stringify($scope.listOrderComplete[i]));
                     $scope.orderCompleteDetail = $scope.listOrderComplete[i];
                     var heightModal = $scope.orderCompleteDetail.products.length * 126 + 113;
                     $scope.isShowOrderDetail = true;
@@ -630,7 +681,7 @@ angular.module('starter.controllers.CashierController', [])
                             $scope.currentOrderInBill.cart.subTotal += $scope.currentOrderInBill.products[i].price;
                             if ($scope.currentOrderInBill.products[i].prodstat != 6) {
                                 //svfee tạm thời của bờ hồ x2 = 10%
-                                $scope.currentOrderInBill.cart.svfee += $scope.currentOrderInBill.products[i].svfee * 2;
+                                $scope.currentOrderInBill.cart.svfee += $scope.currentOrderInBill.products[i].svfee;
                             }
 
                         }
@@ -647,37 +698,20 @@ angular.module('starter.controllers.CashierController', [])
                         $scope.bill = function() {
                             //Duong test print
                             function updateSttPrint() {
-                                for (var j = 0; j < $scope.orderCompleteDetail.products.length; j++) {
-                                    // if ($scope.orderCompleteDetail.products[j].isChecked) {
-                                    var apiData = {
-                                        // 4-12
-                                        funid: UserService.getUser().userinfo.newFunction == "true" ? FuncProc.NeworderCompleteDetail.funid : FuncProc.OldorderCompleteDetail.cartStatus,
-                                        purchasepProdid: $scope.orderCompleteDetail.products[j].purchasedprodid,
-                                        cartid: cart.cart.cartid,
-                                        prodid: $scope.orderCompleteDetail.products[j].prodid,
-                                        quantity: null,
-                                        price: null,
-                                        svfee: null,
-                                        shopchairid: $scope.orderCompleteDetail.products[j].shopcharid,
-                                        optiondetail1: $scope.orderCompleteDetail.products[j].optdetailid1,
-                                        optiondetail2: $scope.orderCompleteDetail.products[j].optdetailid2,
-                                        optiondetail3: $scope.orderCompleteDetail.products[j].optdetailid3,
-                                        // optiondetail:
-                                        desc: null
+
+                                var listProd = [];
+                                //new
+                                for (var i = 0; i < $scope.orderCompleteDetail.products.length; i++) {
+                                    listProd.push($scope.orderCompleteDetail.products[i].purchasedprodid);
+                                    if (i == ($scope.orderCompleteDetail.products.length - 1)) {
+                                        APIService.api_update_PrintStatus({ purchasedprodid: listProd, shopid: UserService.getUser().shopid }).then(function(result) {
+                                            // WSService.close();
+                                            getListOrderComplete();
+                                        }, function(err) {
+                                            $ionicLoading.hide();
+                                        });
                                     }
-                                    console.log(JSON.stringify(apiData));
-                                    APIService.api_update_product(apiData).then(function(result) {
-                                        // console.log(JSON.stringify(result));
-                                        getListOrderComplete();
-                                        // WSService.close();
-                                    }, function(err) {
-                                        // body...
-                                        $ionicLoading.hide();
-                                        console.log(JSON.stringify(err));
-                                    });
-
                                 }
-
                             };
                             if (!$rootScope.utils.activeFunFromUser(UserService.getUser().roleid, 6)) {
                                 // $ionicLoading.show({
@@ -751,7 +785,7 @@ angular.module('starter.controllers.CashierController', [])
                                     "receipt_num": cart.cart.cartnumb + "",
                                     "shift": UserService.getUser().username + "",
                                     "table": cart.cart.shoptablename + "",
-                                    "service_charge_percent": "10%",
+                                    "service_charge_percent": UserService.getUser().shops[0].svfee + "%",
                                     "service_charge_value": moneyfee + "",
                                     "total": moneyTotal + "",
                                     "footer1": "Thank you for coming !",
@@ -780,6 +814,17 @@ angular.module('starter.controllers.CashierController', [])
                                     console.log(result.data);
                                     var objStt = JSON.parse(result.data);
                                     $ionicLoading.hide();
+                                    var apiData = {
+                                        shopid: UserService.getUser().shopid,
+                                        status: objStt,
+                                        logs: 'sendEvtControl'
+                                    };
+                                    console.log(apiData);
+                                    APIService.api_writeLogFile(apiData).then(function(result) {
+                                        console.log(JSON.stringify(result));
+                                    }, function(err) {
+                                        // body...
+                                    });
                                     WSService.close();
                                     // if (result.data.error_code == 0) {
 
@@ -794,6 +839,7 @@ angular.module('starter.controllers.CashierController', [])
                                             //Statements executed when the result of expression matches value1
                                             console.log('In thành công ghi log');
                                             updateSttPrint();
+                                            getListOrderComplete();
                                             viewBillPopup.close();
                                             $scope.isShowOrderDetail = false;
                                             break;
@@ -900,6 +946,17 @@ angular.module('starter.controllers.CashierController', [])
                                 }, function(err) {
                                     $ionicLoading.hide();
                                     console.log(err);
+                                    var apiData = {
+                                        shopid: UserService.getUser().shopid,
+                                        status: err,
+                                        logs: 'sendEvtControl'
+                                    };
+                                    console.log(apiData);
+                                    APIService.api_writeLogFile(apiData).then(function(result) {
+                                        console.log(JSON.stringify(result));
+                                    }, function(err) {
+                                        // body...
+                                    });
                                     var statusPrint = false;
                                     var count = 15;
                                     var timerId = $interval(function() {
@@ -910,11 +967,13 @@ angular.module('starter.controllers.CashierController', [])
                                             $interval.cancel(timerId);
                                             $ionicLoading.hide();
                                             WSService.close();
+
+
                                             console.log(objStt.error_code);
                                             switch (objStt.error_code) {
                                                 case Success_Not_error:
                                                     //Statements executed when the result of expression matches value1
-
+                                                    getListOrderComplete();
                                                     updateSttPrint();
                                                     viewBillPopup.close();
                                                     $scope.isShowOrderDetail = false;
@@ -1028,46 +1087,46 @@ angular.module('starter.controllers.CashierController', [])
                                             console.log('Lỗi in lại :' + err);
                                         });
                                         if (statusPrint == false) {
-                                           
+
 
                                             if (count < 0) {
-                                            $interval.cancel(timerId);
-                                            $ionicLoading.hide();
-                                            console.log('Không thể reconnect tới dock');
-                                            PopupService.showPopup({
-                                                type: 1,
-                                                message: 'Kiểm tra lại Wifi hiện tại  ',
-                                                buttonName: 'OK',
-                                                function: function() {
-                                                    PopupService.closePopup();
-                                                    // console.log(JSON.stringify($rootScope.configPopup));
-                                                }
-                                            });
-                                            // $ionicLoading.show({
-                                            //     template: '<ion-spinner icon="bubbles"></ion-spinner><p>Kiểm tra lại Wifi hiện tại</p>',
-                                            //     content: 'Loading',
-                                            //     // animation: 'fade-in',
-                                            //     showBackdrop: true,
-                                            //     maxWidth: 200,
-                                            // });
-                                            // $timeout(function() {
-                                            //     viewBillPopup.close();
-                                            //     $scope.isShowOrderDetail = false;
-                                            //     $ionicLoading.hide()
-                                            // }, 3000);
-                                        }else{
-                                             viewBillPopup.close();
-                                            $scope.isShowOrderDetail = false;
-                                            $ionicLoading.show({
-                                                template: '<ion-spinner icon="bubbles"></ion-spinner><p>Đang thử In lại ' + count + '</p>',
-                                                content: 'Loading',
-                                                // animation: 'fade-in',
-                                                showBackdrop: false,
-                                                maxWidth: 200,
-                                            });
-                                            console.log('kết nối lại lần thứ : ' + count);
-                                            count -= 1;
-                                        }
+                                                $interval.cancel(timerId);
+                                                $ionicLoading.hide();
+                                                console.log('Không thể reconnect tới dock');
+                                                // PopupService.showPopup({
+                                                //     type: 1,
+                                                //     message: 'Kiểm tra lại Wifi hiện tại  ',
+                                                //     buttonName: 'OK',
+                                                //     function: function() {
+                                                //         PopupService.closePopup();
+                                                //         // console.log(JSON.stringify($rootScope.configPopup));
+                                                //     }
+                                                // });
+                                                // $ionicLoading.show({
+                                                //     template: '<ion-spinner icon="bubbles"></ion-spinner><p>Kiểm tra lại Wifi hiện tại</p>',
+                                                //     content: 'Loading',
+                                                //     // animation: 'fade-in',
+                                                //     showBackdrop: true,
+                                                //     maxWidth: 200,
+                                                // });
+                                                // $timeout(function() {
+                                                //     viewBillPopup.close();
+                                                //     $scope.isShowOrderDetail = false;
+                                                //     $ionicLoading.hide()
+                                                // }, 3000);
+                                            } else {
+                                                viewBillPopup.close();
+                                                $scope.isShowOrderDetail = false;
+                                                $ionicLoading.show({
+                                                    template: '<ion-spinner icon="bubbles"></ion-spinner><p>Đang thử In lại ' + count + '</p>',
+                                                    content: 'Loading',
+                                                    // animation: 'fade-in',
+                                                    showBackdrop: false,
+                                                    maxWidth: 200,
+                                                });
+                                                console.log('kết nối lại lần thứ : ' + count);
+                                                count -= 1;
+                                            }
 
 
                                         } else {
@@ -1075,7 +1134,7 @@ angular.module('starter.controllers.CashierController', [])
                                             $interval.cancel(timerId);
                                             count = 0;
                                         }
-                                        
+
 
 
                                     }, 2000);

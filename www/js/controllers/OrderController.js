@@ -33,8 +33,8 @@ angular.module('starter.controllers.OrderController', [])
         }
 
 
-        // var socket = io('http://it.mycafe.co:3011');
-            var socket = io('http://mycafe.co:3011');
+        var socket = io('http://it.mycafe.co:3011');
+            // var socket = io('http://mycafe.co:3011');
         socket.on('connected', function() {
             console.log('connected')
             $ionicLoading.hide();
@@ -175,7 +175,6 @@ angular.module('starter.controllers.OrderController', [])
         UserService.setCurrentTable($rootScope.listTable.selected);
         console.log(type)
         if (type == 2) {
-            console.log('zxczxcxz');
           $scope.addCartOnline();
         }
       }

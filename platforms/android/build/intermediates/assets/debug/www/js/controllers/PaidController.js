@@ -3,8 +3,8 @@ angular.module('starter.controllers.PaidController', [])
     $cordovaPrinter, ClosePopupService, PopupService) {
     console.log('PaidController');
     $scope.sound = ngAudio.load("sounds/noti.mp3");
-    // var socket = io('http://it.mycafe.co:3011');
-            var socket = io('http://mycafe.co:3011');
+    var socket = io('http://it.mycafe.co:3011');
+            // var socket = io('http://mycafe.co:3011');
     socket.on('connected', function() {
       console.log('connected')
       socket.emit('register', {
@@ -34,7 +34,7 @@ angular.module('starter.controllers.PaidController', [])
       };
       console.log(JSON.stringify(apiData));
       APIService.api_get_history_order(apiData).then(function(result) {
-        console.log(JSON.stringify(result.data));
+        // console.log(JSON.stringify(result.data));
         $scope.listOrderComplete = result.data;
         for (var i = 0; i < $scope.listOrderComplete.length; i++) {
           var total = 0;

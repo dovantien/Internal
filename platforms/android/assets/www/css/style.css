@@ -1,10 +1,11 @@
 /*Duong test*/
-.navBardemoBasicUsage md-content .ext-content {
-  padding: 50px;
-  margin: 20px;
-  background-color: #FFF2E0; }
 
-  
+.navBardemoBasicUsage md-content .ext-content {
+    padding: 50px;
+    margin: 20px;
+    background-color: #FFF2E0;
+}
+
 select {
     background: #e5e5e5;
     width: 13%;
@@ -3038,7 +3039,6 @@ img.friend_avatar {
     margin-top: 1%;
     border: solid 2px;
     border-radius: 5px;
-    
 }
 .listOption .item.item-accordion {
     line-height: 27px;
@@ -3227,7 +3227,7 @@ img.friend_avatar {
     font-size: 16px;
 }
 .orderdetail_prod_stat_6 {
-   position: absolute;
+    position: absolute;
     color: red;
     right: 33px;
     top: 52px;
@@ -3249,6 +3249,15 @@ img.friend_avatar {
     width: 33%;
     background: rgba(251, 251, 251, 0.7);
     margin: 1%;
+}
+.contenct_top_barorder{
+        width: 98%;
+    line-height: 3vw;
+    background: rgba(251, 251, 251, 0.7);
+    margin: 1vw;
+    box-shadow: 2px 2px 7px;
+    position: fixed;
+    height: 4%;
 }
 .content_right_barorder_item {
     padding: 4%;
@@ -3432,7 +3441,7 @@ img.friend_avatar {
 }
 .content_left_barorder_name {
     position: absolute;
-    font-size: 2vw;
+    font-size: 1.8vw;
     font-weight: bold;
     color: red;
     top: 10%;
@@ -3462,24 +3471,29 @@ img.friend_avatar {
 }
 .content_left_barorder_option1 {
     position: absolute;
-    font-size: 1.5vw;
+    font-size: 1.8vw;
+    font-weight: bold;
     color: black;
-    top: 31%;
+    top: 35%;
     left: 4%;
     width: 60%;
 }
 .content_left_barorder_option2 {
     position: absolute;
-    font-size: 1.5vw;
+    font-size: 1.8vw;
+    font-weight: bold;
+    margin-top: 4px;
     color: black;
-    top: 49%;
+    top: 52%;
     left: 4%;
     width: 60%;
 }
 .content_left_barorder_option3 {
     position: absolute;
-    font-size: 1.5vw;
+    font-size: 1.8vw;
+    font-weight: bold;
     color: black;
+    margin-top: 6px;
     top: 68%;
     left: 4%;
     width: 60%;

@@ -16,7 +16,7 @@
                     <div class="col col-50 odh_timeorder" ng-if="item.products[1]">- {{item.products[1].prodnum}} {{item.products[1].prodname}}</div>
                 </div>
                 <div class="row">
-                    <div class="col col-50 odh_status" ng-style="item.cart.printstat > 0 ? {'color':'red', 'font-weight': 'bold'} : {color:'green'} " >{{ item.cart.printstat > 0 ? item.cart.printstat + ' - Sản Phẩm Chưa In' : 'Đã In' }}  </div>
+                    <div class="col col-50 odh_status" ng-style="item.cart.printstat > 0 ? {'color':'red', 'font-weight': 'bold'} : {color:'green'} " >{{ item.cart.printstat > 0 ? ' Error - Có sản phẩm chưa in' : 'Đã In' }}  </div>
                     <div class="col col-50 odh_timeorder" ng-if="item.products[2]">- {{item.products[2].prodnum}} {{item.products[2].prodname}}</div>
                 </div>
                 <div class="row">
@@ -34,7 +34,7 @@
                 <ion-content style="height: 82%">
                     <div ng-repeat="x in orderCompleteDetail.products track by $index" style="padding: 10px; position: relative;border-bottom: solid 1px red;" ng-click="clickEditOrder(x,$index)">
                         <img src="{{x.prodimg}}" class="orderdetail_img">
-                        <div class="orderdetail_prod_name" style="font-weight: bold;">{{x.prodname}}</div>
+                        <div class="orderdetail_prod_name" style="font-weight: bold;">{{$index + 1}} - {{x.prodname}}</div>
                         <div class=""></div>
                         <div class="orderdetail_prod_name" style="color: black;margin-top:30px;"> {{x.optdetailname1 == null ? '' :x.optdetailname1 }}  {{x.optdetailname2 == null ? '' : ' ,'+ x.optdetailname2 }} {{x.optdetailname3 ==null ? '': ' ,' +x.optdetailname3 }} </div>
                         <div class="orderdetail_prod_name" style="color: black;margin-top:55px; ">{{x.shopchairname}}</div>

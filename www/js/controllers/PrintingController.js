@@ -14,8 +14,8 @@ angular.module('starter.controllers.PrintingController', [])
         $scope.paperTypeSelected = {};
         $rootScope.paperType = {};
         $rootScope.dockUrl = "ws://192.168.35.1:9876/ws/";
-        // var socket = io('http://it.mycafe.co:3011');
-        var socket = io('http://mycafe.co:3011');
+        var socket = io('http://it.mycafe.co:3011');
+        // var socket = io('http://mycafe.co:3011');
         socket.on('connected', function() {
             console.log('connected')
             $ionicLoading.hide();

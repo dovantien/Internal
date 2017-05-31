@@ -158,7 +158,7 @@ angular.module('starter.services.WSService', [])
                 }, function(err) {
                     console.log('kết nối DOCK lỗi')
                     console.log(err);
-                    defer.reject(err);
+                    defer.reject('kết nối DOCK lỗi');
                     // isConnecting = false;
                     // var count = 15;
                     // var timerId = $interval(function() {

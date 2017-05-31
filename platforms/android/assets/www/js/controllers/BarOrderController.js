@@ -4,8 +4,8 @@ angular.module('starter.controllers.BarOrderController', [])
             $scope.utils = UtilsService;
             $scope.sound = ngAudio.load("sounds/noti.mp3");
             
-            // var socket = io('http://it.mycafe.co:3011');
-            var socket = io('http://mycafe.co:3011');
+            var socket = io('http://it.mycafe.co:3011');
+            // var socket = io('http://mycafe.co:3011');
             socket.on('connected', function() {
                 console.log('connected')
                 $ionicLoading.hide();
@@ -181,9 +181,11 @@ angular.module('starter.controllers.BarOrderController', [])
                         desc: null,
                         shopid: UserService.getUser().shopid,
                         prodname: prod.prodname,
-                        shoptablename: prod.shoptablename
+                        shoptablename: prod.shoptablename,
+                        orderID: prod.userid
                     }
                     console.log(JSON.stringify(apiData));
+                    console.log(JSON.stringify(prod));
                     APIService.api_update_product(apiData).then(function(result) {
                         console.log(JSON.stringify(result.data));
                         if (!result.data.status) {

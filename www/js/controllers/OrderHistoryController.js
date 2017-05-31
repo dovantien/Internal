@@ -30,7 +30,7 @@ angular.module('starter.controllers.OrderHistoryController', [])
             console.log(JSON.stringify(apiData));
             APIService.api_get_history_order(apiData).then(function(result) {
                 $ionicLoading.hide();
-                console.log(JSON.stringify(result.data));
+                // console.log(JSON.stringify(result.data));
                 UserService.setHistoryOrder(result.data);
                 $scope.listHistoryOrder = UserService.getHistoryOrder();
                 $ionicScrollDelegate.$getByHandle('history_list').scrollTop(false);
@@ -254,7 +254,7 @@ angular.module('starter.controllers.OrderHistoryController', [])
             }
             console.log(JSON.stringify(apiData));
             APIService.api_get_detail_order(apiData).then(function(success) {
-                console.log(JSON.stringify(success.data));
+                // console.log(JSON.stringify(success.data));
                 cart.productsEdit = success.data;
                 var indexProd = 0;
                 forloop(cart.productsEdit.length, function() {
@@ -447,7 +447,7 @@ angular.module('starter.controllers.OrderHistoryController', [])
                             }
                             console.log(JSON.stringify(apicart));
                             APIService.api_update_cart(apicart).then(function(result) {
-                                console.log(JSON.stringify(result));
+                                // console.log(JSON.stringify(result));
                             }, function(err) {
                                 // body...
                             });
