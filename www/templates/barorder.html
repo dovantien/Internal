@@ -1,9 +1,9 @@
 <ion-view view-title="Danh sách sản phẩm order" align-title="right">
   <img src="img/BG_login.jpg" style="width: 100%;height: 100%">
-  <ion-content class="contenct_top_barorder">
+<!--   <ion-content class="contenct_top_barorder">
     <div> <select></select></div>
 
-  </ion-content>
+  </ion-content> -->
   <ion-content class="content_right_barorder" style="top:95px" has-bouncing="false">
     <div ng-repeat="x in listBarOrder" class="content_right_barorder_item" ng-click="getListOrderDetail(x.product.prodid)" ng-style="(x.product.prodid == selectedProd ? {backgroundColor:'red',color:'white'} : {backgroundColor:'none',color:'black'})">
       <div class="content_right_barorder_name">

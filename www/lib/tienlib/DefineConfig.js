@@ -91,9 +91,9 @@ var NUMBER_VERSION = 17;
 var CLIENT_IOS_VERSION = 'Ios_2.0.1';
 var CLIENT_ANDROID_VERSION = 'Android_2.0.1';
 var CHANNEL = 'production';
-var DEPLOY_VERSION = 18;
+var DEPLOY_VERSION = 19;
 // var CHANNEL = 'dev';
-//ban cũ 'production' = 17;
+//ban cũ 'production' = 18;
 // var DEPLOY_VERSION = 12;
 
 //Phân quyền
